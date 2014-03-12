@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Untouchable</string>
+    <string name="action_settings">Settings</string>
+    <string name="menu_start">Start</string>
+    <string name="menu_instructions">Instructions</string>
+    <string name="menu_scores">High Scores</string>
+
+</resources>
