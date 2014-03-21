@@ -4,3 +4,8 @@
 
 11 Mar 2014
 - Created title screen.
+
+20 Mar 2014
+- Created stub classes for game objects.
+- Incorporated accelerometer tutorial code into project.
+- Instructions popup implemented.
