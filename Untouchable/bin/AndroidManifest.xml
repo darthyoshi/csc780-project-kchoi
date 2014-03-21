@@ -24,12 +24,23 @@
             </intent-filter>
         </activity>
         
-        <activity
-            android:name="com.example.untouchable.InstructionActivity"
-            android:label="@string/menu_instructions"
-            android:theme="@style/Theme.Dialog"
+        <!-- activity 
+            android:name="com.example.untouchable.StartActivity"
+            android:label="@string/menu_start"
+            android:screenOrientation="portrait" >
+        </activity-->
+
+        <activity 
+            android:name="com.example.untouchable.GameActivity"
+            android:label="@string/menu_start"
             android:screenOrientation="portrait" >
         </activity>
-    </application>
+        
+        <activity 
+            android:name="com.example.untouchable.HiScoreActivity"
+            android:label="@string/menu_scores"
+            android:screenOrientation="portrait" >
+        </activity>        
+</application>
 
 </manifest>

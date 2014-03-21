@@ -17,7 +17,9 @@
         android:layout_below="@+id/startButton"
         android:layout_centerHorizontal="true"
         android:clickable="true"
-        android:text="@string/menu_instructions" />
+        android:text="@string/menu_instructions"
+        android:textColor="@color/white"
+        android:onClick="onClickInstruct" />
 
     <Button
         android:id="@+id/scoresButton"
@@ -26,7 +28,9 @@
         android:layout_below="@+id/instructButton"
         android:layout_centerHorizontal="true"
         android:clickable="true"
-        android:text="@string/menu_scores"/>
+        android:textColor="@color/white"
+        android:text="@string/menu_scores"
+        android:onClick="onClickScores" />
 
     <TextView
         android:id="@+id/title"
@@ -47,6 +51,8 @@
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
         android:clickable="true"
-        android:text="@string/menu_start" />
+        android:textColor="@color/white"
+        android:text="@string/menu_start"
+        android:onClick="onClickStart" />
 
 </RelativeLayout>
