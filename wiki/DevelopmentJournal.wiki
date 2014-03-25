@@ -10,6 +10,6 @@
   * Incorporated accelerometer tutorial code into project.
   * Instructions popup implemented.
 
-25 Mar 2014
+24 Mar 2014
   * Implemented difficulty select screen, high score screen, and game screen as Fragments.
   * Game screen currently displays initial and current accelerometer values.
