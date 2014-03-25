@@ -5,7 +5,7 @@
     android:versionName="1.0" >
 
     <uses-sdk
-        android:minSdkVersion="11"
+        android:minSdkVersion="14"
         android:targetSdkVersion="19" />
 
     <application
@@ -36,11 +36,11 @@
             android:screenOrientation="portrait" >
         </activity>
         
-        <activity 
+        <!-- activity 
             android:name="com.example.untouchable.HiScoreActivity"
             android:label="@string/menu_scores"
             android:screenOrientation="portrait" >
-        </activity>        
+        </activity-->        
 </application>
 
 </manifest>

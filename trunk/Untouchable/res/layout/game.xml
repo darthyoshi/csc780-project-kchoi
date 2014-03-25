@@ -2,40 +2,42 @@
 <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:background="@color/black" >
+    android:background="@color/transparent" >
+
     <TableRow android:id="@+id/tableRowX" android:layout_width="wrap_content"
         android:layout_height="wrap_content">
-        <TextView android:layout_margin="15dp" android:text="X axis:" />
+        <TextView android:layout_margin="15dp" android:text="X axis:" android:textColor="@color/white" />
         <TextView android:id="@+id/lblX" android:layout_margin="15dp"
-            android:text="n.a." />
-        <TextView android:layout_margin="15dp" android:text="init:" />
+            android:text="n.a." android:textColor="@color/white" />
+        <TextView android:layout_margin="15dp" android:text="init:" android:textColor="@color/white" />
         <TextView android:id="@+id/initX" android:layout_margin="15dp"
-            android:text="n.a." />
+            android:text="n.a." android:textColor="@color/white" />
     </TableRow>
     <TableRow android:id="@+id/tableRowY" android:layout_width="wrap_content"
         android:layout_height="wrap_content">
-        <TextView android:layout_margin="15dp" android:text="Y axis:" />
+        <TextView android:layout_margin="15dp" android:text="Y axis:" android:textColor="@color/white" />
         <TextView android:id="@+id/lblY" android:layout_margin="15dp"
-            android:text="n.a." />
-        <TextView android:layout_margin="15dp" android:text="init:" />
+            android:text="n.a." android:textColor="@color/white" />
+        <TextView android:layout_margin="15dp" android:text="init:" android:textColor="@color/white" />
         <TextView android:id="@+id/initY" android:layout_margin="15dp"
-            android:text="n.a." />
+            android:text="n.a." android:textColor="@color/white" />
     </TableRow>
     <TableRow android:id="@+id/tableRowZ" android:layout_width="wrap_content"
         android:layout_height="wrap_content">
-        <TextView android:layout_margin="15dp" android:text="Z axis:" />
+        <TextView android:layout_margin="15dp" android:text="Z axis:" android:textColor="@color/white" />
         <TextView android:id="@+id/lblZ" android:layout_margin="15dp"
-            android:text="n.a." />
-        <TextView android:layout_margin="15dp" android:text="init:" />
+            android:text="n.a." android:textColor="@color/white" />
+        <TextView android:layout_margin="15dp" android:text="init:" android:textColor="@color/white" />
         <TextView android:id="@+id/initZ" android:layout_margin="15dp"
-            android:text="n.a." />
+            android:text="n.a." android:textColor="@color/white" />
     </TableRow>
 
     <Button
-        android:id="@+id/button1"
+        android:id="@+id/doneButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Button"
+        android:text="@string/done"
+        android:textColor="@color/white"
         android:onClick="onClick" />
 
 </TableLayout>

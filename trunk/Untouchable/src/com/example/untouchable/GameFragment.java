@@ -6,12 +6,13 @@
 package com.example.untouchable;
 
 import android.app.*;
+import android.content.Context;
 import android.hardware.*;
 import android.os.Bundle;
 import android.view.*;
 import android.widget.*;
 
-public class GameActivity extends Fragment implements SensorEventListener {
+public class GameFragment extends Fragment implements SensorEventListener {
 	private TextView lblX, lblX2;
 	private TextView lblY, lblY2;
 	private TextView lblZ, lblZ2;
@@ -19,7 +20,13 @@ public class GameActivity extends Fragment implements SensorEventListener {
 	private Float yInit;
 	private Float zInit;
 	private boolean init = false;
+	private int difficulty;
 
+	public GameFragment(int difficulty) {
+		super();
+		this.difficulty = difficulty;
+	}
+	
 	/**
      *  @param inflater
      *  @param container
@@ -36,26 +43,20 @@ public class GameActivity extends Fragment implements SensorEventListener {
 	}
 	
 	
-/*	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		/*
-		requestWindowFeature(Window.FEATURE_NO_TITLE);
+	public void init() {
+		Activity parent = getActivity();
+		lblX = (TextView)parent.findViewById(R.id.lblX);
+		lblY = (TextView)parent.findViewById(R.id.lblY);
+		lblZ = (TextView)parent.findViewById(R.id.lblZ);
 		
-		setContentView(R.layout.game);
-		*/public void init(){
-		lblX = (TextView)getActivity().findViewById(R.id.lblX);
-		lblY = (TextView)getActivity().findViewById(R.id.lblY);
-		lblZ = (TextView)getActivity().findViewById(R.id.lblZ);
-		
-		lblX2 = (TextView)getActivity().findViewById(R.id.initX);
-		lblY2 = (TextView)getActivity().findViewById(R.id.initY);
-		lblZ2 = (TextView)getActivity().findViewById(R.id.initZ);
+		lblX2 = (TextView)parent.findViewById(R.id.initX);
+		lblY2 = (TextView)parent.findViewById(R.id.initY);
+		lblZ2 = (TextView)parent.findViewById(R.id.initZ);
 		
         /*
          * Retrieve the SensorManager.
          */
-        SensorManager sensorManager = (SensorManager) getActivity().getSystemService(getActivity().SENSOR_SERVICE);
+        SensorManager sensorManager = (SensorManager) parent.getSystemService(Context.SENSOR_SERVICE);
         /*
          * Retrieve the default Sensor for the accelerometer.
          */
@@ -70,6 +71,7 @@ public class GameActivity extends Fragment implements SensorEventListener {
 	@Override
 	public void onResume() {
 		super.onResume();
+		init();
 		init = false;
 	}
 	
@@ -87,7 +89,7 @@ public class GameActivity extends Fragment implements SensorEventListener {
 			xInit = event.values[0];
 			yInit = event.values[1];
 			zInit = event.values[2];
-			
+
 			lblX2.setText(Float.toString(xInit));
 			lblY2.setText(Float.toString(yInit));
 			lblZ2.setText(Float.toString(zInit));
@@ -100,10 +102,4 @@ public class GameActivity extends Fragment implements SensorEventListener {
 		}
 
 	}
-	
-	/*
-	public void onClick(View v) {
-		finish();
-	}
-*/
 }

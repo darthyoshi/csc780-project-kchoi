@@ -10,68 +10,16 @@
     android:background="@color/black"
     tools:context=".MainActivity" >
 
-    <!-- com.example.untouchable.Background
+    <com.example.untouchable.Background
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:id="@+id/game_area" />
-    
-    <Button
-        android:id="@+id/instructButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/startButton"
-        android:layout_centerHorizontal="true"
-        android:clickable="true"
-        android:text="@string/menu_instructions"
-        android:textColor="@color/white"
-        android:onClick="onClickInstruct" />
+        android:id="@+id/bg" />
 
-    <Button
-        android:id="@+id/scoresButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/instructButton"
-        android:layout_centerHorizontal="true"
-        android:clickable="true"
-        android:textColor="@color/white"
-        android:text="@string/menu_scores"
-        android:onClick="onClickScores" />
-
-    <TextView
-        android:id="@+id/title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="33dp"
-        android:text="@string/app_name"
-        android:textColor="@color/white"
-        android:textSize="50sp"
-        android:textStyle="bold|italic" />
-    
-    <Button
-        android:id="@+id/startButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:clickable="true"
-        android:textColor="@color/white"
-        android:text="@string/menu_start"
-        android:onClick="onClickStart" /-->
-
-    <fragment
-        android:id="@+id/title_fragment"
-        android:name="com.example.untouchable.TitleFragment"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:layout="@layout/title" />
-
-    <fragment
-        android:id="@+id/game_fragment"
-        android:name="com.example.untouchable.GameActivity"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:layout="@layout/game" />
+    <FrameLayout 
+        android:id="@+id/main_frame"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:background="@color/transparent" >
+    </FrameLayout>
 
 </RelativeLayout>
