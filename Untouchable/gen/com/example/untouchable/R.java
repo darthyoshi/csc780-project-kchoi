@@ -8,10 +8,14 @@
 package com.example.untouchable;
 
 public final class R {
+    public static final class array {
+        public static final int values=0x7f060000;
+    }
     public static final class attr {
     }
     public static final class color {
         public static final int black=0x7f040000;
+        public static final int transparent=0x7f040002;
         public static final int white=0x7f040001;
     }
     public static final class dimen {
@@ -28,40 +32,53 @@ public final class R {
         public static final int ic_launcher=0x7f020000;
     }
     public static final class id {
-        public static final int action_settings=0x7f090010;
-        public static final int button1=0x7f09000b;
-        public static final int game_fragment=0x7f090001;
-        public static final int initX=0x7f090004;
-        public static final int initY=0x7f090007;
-        public static final int initZ=0x7f09000a;
-        public static final int instructButton=0x7f09000c;
-        public static final int lblX=0x7f090003;
-        public static final int lblY=0x7f090006;
-        public static final int lblZ=0x7f090009;
-        public static final int scoresButton=0x7f09000e;
-        public static final int startButton=0x7f09000d;
-        public static final int tableRowX=0x7f090002;
-        public static final int tableRowY=0x7f090005;
-        public static final int tableRowZ=0x7f090008;
-        public static final int title=0x7f09000f;
-        public static final int title_fragment=0x7f090000;
+        public static final int action_settings=0x7f0a0015;
+        public static final int bg=0x7f0a0000;
+        public static final int doneButton=0x7f0a000b;
+        public static final int easy=0x7f0a000f;
+        public static final int hard=0x7f0a000d;
+        public static final int initX=0x7f0a0004;
+        public static final int initY=0x7f0a0007;
+        public static final int initZ=0x7f0a000a;
+        public static final int instructButton=0x7f0a0011;
+        public static final int lblX=0x7f0a0003;
+        public static final int lblY=0x7f0a0006;
+        public static final int lblZ=0x7f0a0009;
+        public static final int main_frame=0x7f0a0001;
+        public static final int normal=0x7f0a000e;
+        public static final int score_title=0x7f0a000c;
+        public static final int scoresButton=0x7f0a0013;
+        public static final int startButton=0x7f0a0012;
+        public static final int tableRowX=0x7f0a0002;
+        public static final int tableRowY=0x7f0a0005;
+        public static final int tableRowZ=0x7f0a0008;
+        public static final int textView1=0x7f0a0010;
+        public static final int title=0x7f0a0014;
     }
     public static final class layout {
         public static final int activity_main=0x7f030000;
         public static final int game=0x7f030001;
-        public static final int title=0x7f030002;
+        public static final int scores=0x7f030002;
+        public static final int start=0x7f030003;
+        public static final int title=0x7f030004;
     }
     public static final class menu {
-        public static final int main=0x7f080000;
+        public static final int main=0x7f090000;
     }
     public static final class string {
-        public static final int action_settings=0x7f060001;
-        public static final int app_name=0x7f060000;
-        public static final int confirm=0x7f060006;
-        public static final int instructions=0x7f060005;
-        public static final int menu_instructions=0x7f060003;
-        public static final int menu_scores=0x7f060004;
-        public static final int menu_start=0x7f060002;
+        public static final int action_settings=0x7f070001;
+        public static final int app_name=0x7f070000;
+        public static final int confirm=0x7f070006;
+        public static final int default_name=0x7f07000c;
+        public static final int difficulty=0x7f07000a;
+        public static final int done=0x7f070007;
+        public static final int easy=0x7f07000b;
+        public static final int hard=0x7f070008;
+        public static final int instructions=0x7f070005;
+        public static final int menu_instructions=0x7f070003;
+        public static final int menu_scores=0x7f070004;
+        public static final int menu_start=0x7f070002;
+        public static final int normal=0x7f070009;
     }
     public static final class style {
         /** 
@@ -85,10 +102,10 @@ public final class R {
     
  API 14 theme customizations can go here. 
          */
-        public static final int AppBaseTheme=0x7f070000;
+        public static final int AppBaseTheme=0x7f080000;
         /**  Application theme. 
  All customizations that are NOT specific to a particular API-level can go here. 
          */
-        public static final int AppTheme=0x7f070001;
+        public static final int AppTheme=0x7f080001;
     }
 }

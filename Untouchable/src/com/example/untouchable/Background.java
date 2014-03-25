@@ -4,15 +4,17 @@
  */
 package com.example.untouchable;
 
-import java.io.Serializable;
 import java.util.*;
 
 import android.content.Context;
 import android.graphics.*;
+import android.os.Handler;
 import android.util.AttributeSet;
 import android.view.View;
 
 public class Background extends View {
+	private Handler handle;
+	private final int frameRate = 20;
     private Paint p;
     private static List<Point> starField = null;
     private static List<Integer> scrollSpeeds = null;
@@ -28,6 +30,14 @@ public class Background extends View {
 		super(context, attrs);
 		p = new Paint();
 		r = new Random();
+		
+        handle = new Handler();
+        handle.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                initGfx();
+            }
+        }, 1000);
 	}
 
     private void initializeStars(int maxX, int maxY) {
@@ -80,4 +90,20 @@ public class Background extends View {
         }
 
     }
+    
+
+    synchronized public void initGfx() {
+        handle.removeCallbacks(frameUpdate);
+        handle.postDelayed(frameUpdate, frameRate);
+    }
+    
+    private Runnable frameUpdate = new Runnable() {
+        @Override
+        synchronized public void run() {
+            handle.removeCallbacks(frameUpdate);
+            
+            invalidate();
+            handle.postDelayed(frameUpdate, frameRate);
+        }
+    };
 }

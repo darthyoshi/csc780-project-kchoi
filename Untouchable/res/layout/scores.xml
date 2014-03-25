@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@color/transparent" >
+
+    <!-- FrameLayout
+        android:id="@+id/score_frame"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_below="@+id/score_title"
+        android:background="@color/transparent" >
+
+	    <ListView
+	        android:id="@+id/score_list"
+	        android:layout_width="fill_parent"
+	        android:layout_height="match_parent" >
+	    </ListView>
+	
+	</FrameLayout -->
+
+	<TextView
+	    android:id="@+id/score_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="25dp"
+        android:text="@string/menu_scores"
+        android:textColor="@color/white"
+        android:textSize="30sp" />
+	
+    <Button
+        android:id="@+id/doneButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:text="@string/done"
+        android:textColor="@color/white"
+        android:onClick="onClick" />
+
+</RelativeLayout>
