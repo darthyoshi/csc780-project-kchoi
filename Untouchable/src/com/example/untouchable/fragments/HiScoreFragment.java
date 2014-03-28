@@ -3,19 +3,19 @@
  *  @author Kay Choi
  */
 
-package com.example.untouchable;
+package com.example.untouchable.fragments;
 
 import java.util.*;
 import java.util.Map.Entry;
 import java.io.*;
 
+import com.example.untouchable.*;
+
 import android.app.*;
 import android.content.Context;
 import android.content.res.Resources;
 import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import android.view.*;
 
 public class HiScoreFragment extends Fragment {
     private SortedMap<Integer, String> scoreList = null;

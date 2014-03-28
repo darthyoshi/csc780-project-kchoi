@@ -1,8 +1,8 @@
 /**
- * @file GameArea.java
+ * @file Background.java
  * @author Kay Choi 
  */
-package com.example.untouchable;
+package com.example.untouchable.canvas;
 
 import java.util.*;
 
