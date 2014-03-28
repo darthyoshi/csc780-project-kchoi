@@ -13,3 +13,7 @@
 24 Mar 2014
   * Implemented difficulty select screen, high score screen, and game screen as Fragments.
   * Game screen currently displays initial and current accelerometer values.
+
+28 Mar 2014
+  * Reorganized classes into packages.
+  * Created Foreground class as SurfaceView extension and added to GameFragment.
