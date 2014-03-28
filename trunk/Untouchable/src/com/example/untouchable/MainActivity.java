@@ -4,12 +4,12 @@
  */ 
  
 package com.example.untouchable;
- 
+
 import android.app.*;
-import android.content.*;
-import android.os.*;
+import android.os.Bundle;
 import android.view.*;
-import android.widget.*;
+
+import com.example.untouchable.fragments.*;
 
 public class MainActivity extends Activity {
 	private Fragment frag;
@@ -41,28 +41,28 @@ public class MainActivity extends Activity {
     public void onClick(View v) {
     	frag = getActiveFragment();
 
-		int view = v.getId();
-    	switch(view) {
+		int viewId = v.getId();
+    	switch(viewId) {
     		case R.id.doneButton:
     			getFragmentManager().popBackStackImmediate("TITLE_FRAGMENT", 0);
     			break;
     			
     		case R.id.easy:
+    			((StartFragment)frag).setDifficulty(1);
+    			break;
+    			
     		case R.id.normal:
+    			((StartFragment)frag).setDifficulty(2);
+    			break;
+    			
     		case R.id.hard:
-    			((StartFragment)frag).setDifficulty(view);
+    			((StartFragment)frag).setDifficulty(3);
     			break;
 			
     		case R.id.startButton:
-    			((TitleFragment)frag).onClickStart(v);
-    			break;
-    		
     		case R.id.instructButton:
-    			((TitleFragment)frag).onClickInstruct(v);
-    			break;
-    		
     		case R.id.scoresButton:
-    			((TitleFragment)frag).onClickScores(v);
+    			((TitleFragment)frag).onClick(v);
         		break;
 		}
     }
@@ -77,5 +77,16 @@ public class MainActivity extends Activity {
 	    }
         
     	return result;
+    }
+    
+    @Override
+    public void onBackPressed() {
+    	if(getFragmentManager().getBackStackEntryCount() > 1) {
+    		super.onBackPressed();
+    	}
+    	
+    	else {
+    		finish();
+    	}
     }
 }

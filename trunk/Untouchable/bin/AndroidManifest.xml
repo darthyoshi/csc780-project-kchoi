@@ -23,24 +23,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        
-        <!-- activity 
-            android:name="com.example.untouchable.StartActivity"
-            android:label="@string/menu_start"
-            android:screenOrientation="portrait" >
-        </activity-->
-
-        <activity 
-            android:name="com.example.untouchable.GameActivity"
-            android:label="@string/menu_start"
-            android:screenOrientation="portrait" >
-        </activity>
-        
-        <!-- activity 
-            android:name="com.example.untouchable.HiScoreActivity"
-            android:label="@string/menu_scores"
-            android:screenOrientation="portrait" >
-        </activity-->        
 </application>
 
 </manifest>

@@ -30,7 +30,7 @@
         android:textColor="@color/white"
         android:textSize="30sp" />
 	
-    <Button
+    <!--  Button
         android:id="@+id/doneButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -38,6 +38,6 @@
         android:layout_centerHorizontal="true"
         android:text="@string/done"
         android:textColor="@color/white"
-        android:onClick="onClick" />
+        android:onClick="onClick" /-->
 
 </RelativeLayout>

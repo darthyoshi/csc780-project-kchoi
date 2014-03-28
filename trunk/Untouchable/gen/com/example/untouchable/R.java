@@ -32,35 +32,38 @@ public final class R {
         public static final int ic_launcher=0x7f020000;
     }
     public static final class id {
-        public static final int action_settings=0x7f0a0015;
+        public static final int action_settings=0x7f0a0017;
         public static final int bg=0x7f0a0000;
-        public static final int doneButton=0x7f0a000b;
-        public static final int easy=0x7f0a000f;
-        public static final int hard=0x7f0a000d;
-        public static final int initX=0x7f0a0004;
-        public static final int initY=0x7f0a0007;
-        public static final int initZ=0x7f0a000a;
-        public static final int instructButton=0x7f0a0011;
-        public static final int lblX=0x7f0a0003;
-        public static final int lblY=0x7f0a0006;
-        public static final int lblZ=0x7f0a0009;
+        public static final int doneButton=0x7f0a000c;
+        public static final int easy=0x7f0a0012;
+        public static final int fg=0x7f0a0002;
+        public static final int hard=0x7f0a0010;
+        public static final int initX=0x7f0a0005;
+        public static final int initY=0x7f0a0008;
+        public static final int initZ=0x7f0a000b;
+        public static final int instructButton=0x7f0a0013;
+        public static final int lblX=0x7f0a0004;
+        public static final int lblY=0x7f0a0007;
+        public static final int lblZ=0x7f0a000a;
         public static final int main_frame=0x7f0a0001;
-        public static final int normal=0x7f0a000e;
-        public static final int score_title=0x7f0a000c;
-        public static final int scoresButton=0x7f0a0013;
-        public static final int startButton=0x7f0a0012;
-        public static final int tableRowX=0x7f0a0002;
-        public static final int tableRowY=0x7f0a0005;
-        public static final int tableRowZ=0x7f0a0008;
-        public static final int textView1=0x7f0a0010;
-        public static final int title=0x7f0a0014;
+        public static final int normal=0x7f0a0011;
+        public static final int score_title=0x7f0a000f;
+        public static final int scoresButton=0x7f0a0015;
+        public static final int startButton=0x7f0a0014;
+        public static final int tableRowX=0x7f0a0003;
+        public static final int tableRowY=0x7f0a0006;
+        public static final int tableRowZ=0x7f0a0009;
+        public static final int textView1=0x7f0a000d;
+        public static final int textView2=0x7f0a000e;
+        public static final int title=0x7f0a0016;
     }
     public static final class layout {
         public static final int activity_main=0x7f030000;
         public static final int game=0x7f030001;
-        public static final int scores=0x7f030002;
-        public static final int start=0x7f030003;
-        public static final int title=0x7f030004;
+        public static final int instruct=0x7f030002;
+        public static final int scores=0x7f030003;
+        public static final int start=0x7f030004;
+        public static final int title=0x7f030005;
     }
     public static final class menu {
         public static final int main=0x7f090000;

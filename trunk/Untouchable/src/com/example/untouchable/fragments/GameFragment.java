@@ -3,7 +3,10 @@
  *  @author Kay Choi
  */
 
-package com.example.untouchable;
+package com.example.untouchable.fragments;
+
+import com.example.untouchable.*;
+import com.example.untouchable.canvas.Foreground;
 
 import android.app.*;
 import android.content.Context;
@@ -21,11 +24,6 @@ public class GameFragment extends Fragment implements SensorEventListener {
 	private Float zInit;
 	private boolean init = false;
 	private int difficulty;
-
-	public GameFragment(int difficulty) {
-		super();
-		this.difficulty = difficulty;
-	}
 	
 	/**
      *  @param inflater
@@ -37,8 +35,7 @@ public class GameFragment extends Fragment implements SensorEventListener {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
         Bundle savedInstanceState) 
 	{
-		init();
-        // Inflate the layout for this fragment
+		// Inflate the layout for this fragment
 		return inflater.inflate(R.layout.game, container, false);
 	}
 	
@@ -101,5 +98,21 @@ public class GameFragment extends Fragment implements SensorEventListener {
 			lblZ.setText(Float.toString(event.values[2] - zInit));
 		}
 
+	}
+
+
+	/**
+	 * @return the difficulty
+	 */
+	public int getDifficulty() {
+		return difficulty;
+	}
+
+
+	/**
+	 * @param difficulty the difficulty to set
+	 */
+	public void setDifficulty(int difficulty) {
+		this.difficulty = difficulty;
 	}
 }

@@ -3,21 +3,15 @@
  *  @author Kay Choi
  */
 
-package com.example.untouchable;
+package com.example.untouchable.fragments;
 
-import android.app.Fragment;
-import android.app.FragmentManager;
+import com.example.untouchable.*;
+
+import android.app.*;
 import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import android.view.*;
 
 public class StartFragment extends Fragment {
-
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-	}
 	
 	/**
      *  @param inflater
@@ -29,15 +23,16 @@ public class StartFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
         Bundle savedInstanceState) 
 	{
-        // Inflate the layout for /*this*/getActivity() fragment
+        // Inflate the layout for this fragment
 		return inflater.inflate(R.layout.start, container, false);
 	}
 	
 	public void setDifficulty(int difficulty) {
-    	Fragment frag = new GameFragment(difficulty);
-    	FragmentManager fragMan = getFragmentManager();
+    	GameFragment frag = new GameFragment();
     	
-    	//fragMan.popBackStackImmediate("TITLE_FRAGMENT", 0);
+    	frag.setDifficulty(difficulty);
+    	
+    	FragmentManager fragMan = getFragmentManager();
     	
     	fragMan
     		.beginTransaction()
