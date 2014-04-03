@@ -5,51 +5,85 @@
 
 package com.example.untouchable.obj;
 
-public class Player {
-	private int x;
-	private int y;
+import android.content.Context;
+import android.graphics.*;
+import android.view.*;
 
+import com.example.untouchable.R;
+
+public class Player extends GameObject {
+	private static int frame = 0, width, height;
+	int xSpeed = 0, ySpeed = 0, dZ = 0;
+	Rect src, dst;
+	
 	/**
-	 *  Class constructor.
+	 * Class constructor.
 	 * @param x
 	 * @param y
+	 * @param view
 	 */
-	public Player(int x, int y) {
-		this.setX(x);
-		this.setY(y);
+	public Player(Context context) {
+		this.context = context;
+		
+		sprite = BitmapFactory.decodeResource(context.getResources(), R.drawable.sprite_player);
+		
+		height = sprite.getHeight();
+		width = sprite.getWidth() / 2;
+
+		Display display = ((WindowManager)context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+		Point outSize = new Point();
+		
+		display.getSize(outSize);
+		
+		x = outSize.x/2 - width;
+		y = outSize.y - 2*height;
 	}
 
-	/**
-	 *  Returns the y-coordinate of the player craft.
-	 *  @return the y-coordinate
-	 */
-	public int getY() {
-		return y;
-	}
+	private void update (Canvas canvas) {
+		frame = ++frame % 4;
 
-	/**
-	 *  Sets the y-coordinate of the player craft.
-	 *  @param y the new y-coordinate
-	 */
-	public void setY(int y) {
-		this.y = y;
-	}
+		int srcX = (frame/2) * width;
+		
+		src = new Rect(srcX, 0, srcX+width, height);
+		dst = new Rect(x, y, x+width, y+height);
+		
+		if(x < 0) {
+			x = 0;
+		}
+		
+		else if(x > canvas.getWidth() - width) {
+			x = canvas.getWidth() - width;
+		}
+		
+		else {
+			x += xSpeed;
+		}
+		
+		if(y < 0) {
+			y = 0;
+		}
+		
+		else if (y > canvas.getHeight() - height) {
+			y = canvas.getHeight() - height;
+		}
 
-	/**
-	 *  Returns the x-coordinate of the player craft.
-	 *  @return the x-coordinate
-	 */
-	public int getX() {
-		return x;
+		else {
+			y += ySpeed;
+		}
+		
 	}
-
-	/**
-	 * 	Returns the x-coordinate of the player craft.
-	 *  @param x the new x-coordinate
-	 */
-	public void setX(int x) {
-		this.x = x;
+	//TODO fix y update rate
+	public void setSpeed(int dX, int dY, int dZ) {
+		this.xSpeed = dX;
+		this.ySpeed = dY;
 	}
 	
+	public void draw(Canvas canvas) {
+		update(canvas);
+		canvas.drawBitmap(sprite, src, dst, null);
+	}
 	
+	public Point getCenter() {
+		return new Point(x + width, y + height);
+	}
 }
