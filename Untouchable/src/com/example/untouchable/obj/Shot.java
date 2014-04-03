@@ -4,11 +4,15 @@
  */
 package com.example.untouchable.obj;
 
-public class Shot {
-	private int x;
-	private int y;
-	private float bearing;
-	private float velocity;
+import com.example.untouchable.R;
+
+import android.content.Context;
+import android.graphics.BitmapFactory;
+import android.view.SurfaceView;
+
+public class Shot extends GameObject {
+	private double bearing;
+	private double speed = 0.;
 	
 	/**
 	 *  Class constructor.
@@ -17,46 +21,38 @@ public class Shot {
 	 *  @param bearing the initial bearing
 	 *  @param velocity the initial velocity
 	 */
-	public Shot(int x, int y, float bearing, float velocity) {
+	public Shot(int x, int y, double bearing, Context context) {
 		this.x = x;
 		this.y = y;
 		this.bearing = bearing;
-		this.velocity = velocity;
-	}
-
-	/**
-	 * @return the x
-	 */
-	public int getX() {
-		return x;
+		sprite = BitmapFactory.decodeResource(context.getResources(), R.drawable.sprite_shot);
 	}
 
 	/**
 	 * @return the velocity
 	 */
-	public float getVelocity() {
-		return velocity;
+	public double getVelocity() {
+		return speed;
 	}
 
 	/**
 	 * @param velocity the velocity to set
 	 */
-	public void setVelocity(float velocity) {
-		this.velocity = velocity;
+	public void setVelocity(double velocity) {
+		this.speed = velocity;
 	}
 
 	/**
 	 * @return the bearing
 	 */
-	public float getBearing() {
+	public double getBearing() {
 		return bearing;
 	}
-
+	
 	/**
-	 * @return the y
+	 * @param bearing the bearing to set
 	 */
-	public int getY() {
-		return y;
+	public void setBearing(double bearing) {
+		this.bearing = bearing;
 	}
-
 }

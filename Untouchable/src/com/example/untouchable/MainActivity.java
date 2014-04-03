@@ -8,7 +8,6 @@ package com.example.untouchable;
 import android.app.*;
 import android.os.Bundle;
 import android.view.*;
-
 import com.example.untouchable.fragments.*;
 
 public class MainActivity extends Activity {
@@ -43,9 +42,9 @@ public class MainActivity extends Activity {
 
 		int viewId = v.getId();
     	switch(viewId) {
-    		case R.id.doneButton:
+/*    		case R.id.doneButton:
     			getFragmentManager().popBackStackImmediate("TITLE_FRAGMENT", 0);
-    			break;
+    			break;*/
     			
     		case R.id.easy:
     			((StartFragment)frag).setDifficulty(1);
@@ -70,9 +69,11 @@ public class MainActivity extends Activity {
     private Fragment getActiveFragment() {
     	FragmentManager fragMan = getFragmentManager();
     	Fragment result = null;
+    	
+    	int count = fragMan.getBackStackEntryCount();
 
-        if (fragMan.getBackStackEntryCount() > 0) {
-	        String tag = fragMan.getBackStackEntryAt(fragMan.getBackStackEntryCount()-1).getName();
+        if (count > 0) {
+	        String tag = fragMan.getBackStackEntryAt(count-1).getName();
 	        result = fragMan.findFragmentByTag(tag);
 	    }
         
@@ -81,7 +82,13 @@ public class MainActivity extends Activity {
     
     @Override
     public void onBackPressed() {
-    	if(getFragmentManager().getBackStackEntryCount() > 1) {
+    	frag = getActiveFragment();
+    	
+    	if(frag.getTag().equals("GAME_FRAGMENT")) {
+    		((GameFragment)frag).onBackPressed();
+    	}
+    	
+    	else if(getFragmentManager().getBackStackEntryCount() > 1) {
     		super.onBackPressed();
     	}
     	

@@ -91,16 +91,16 @@ public class Background extends View {
 
     }
     
-
     synchronized public void initGfx() {
         handle.removeCallbacks(frameUpdate);
         handle.postDelayed(frameUpdate, frameRate);
     }
     
     private Runnable frameUpdate = new Runnable() {
-        @Override
+    	
+    	@Override
         synchronized public void run() {
-            handle.removeCallbacks(frameUpdate);
+        	handle.removeCallbacks(frameUpdate);
             
             invalidate();
             handle.postDelayed(frameUpdate, frameRate);
