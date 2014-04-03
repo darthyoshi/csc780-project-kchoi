@@ -16,8 +16,8 @@
 
 28 Mar 2014
   * Reorganized classes into packages.
-  * Created Foreground class as SurfaceView extension and added to GameFragment.
+  * Created `Foreground` class as `SurfaceView` extension and added to `GameFragment`.
 
 2 Apr 2014 
-  * Added Shot and Gun sprites.
-  * Player and Gun appear on stage and update in response to accelerometer values.
+  * Added `Shot` and `Gun` sprites.
+  * `Player` and `Gun` appear on stage and update in response to accelerometer values.
