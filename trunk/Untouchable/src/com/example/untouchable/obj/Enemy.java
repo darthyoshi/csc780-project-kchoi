@@ -7,25 +7,60 @@ package com.example.untouchable.obj;
 
 import java.util.ArrayList;
 
-import com.example.untouchable.R;
-
 import android.content.Context;
 import android.graphics.BitmapFactory;
-import android.view.SurfaceView;
+
+import com.example.untouchable.R;
 
 //TODO create Enemy fields and methods
 public class Enemy extends GameObject {
 	private ArrayList<Gun> guns;
+	private int type;
+	
 	/**
 	 * 
-	 * @param x
-	 * @param y
-	 * @param view
+	 * @param context
 	 * @param type
 	 */
 	public Enemy(Context context, int type) {
+		this.type = type;
+		this.sprite = BitmapFactory.decodeResource(context.getResources(), type);
+		this.context = context;
+		
+		genGuns();
+	}
+	
+	private void genGuns() {
 		guns = new ArrayList<Gun>();
-		//this.sprite = BitmapFactory.decodeResource(context.getResources(), R.drawable.sprite_enemy)
+		
+		short i = 0;
+		int x, y;
+		switch(type) {
+		case R.drawable.sprite_enemy_1:
+			while(i < 5) {
+				guns.add(new Gun(0, 0, i, context));
+			}
+			break;
+		
+		case R.drawable.sprite_enemy_2:
+			
+			break;
+		
+		case R.drawable.sprite_enemy_3:
+			
+			break;
+		
+		case R.drawable.sprite_enemy_4:
+			
+			break;
+		
+		case R.drawable.sprite_enemy_5:
+			
+		}
+	}
+	
+	public void init() {
+		guns.clear();
 	}
 	
 	/**
@@ -35,4 +70,13 @@ public class Enemy extends GameObject {
 		return guns;
 	}
 	
+	public void fireGuns() {
+		for(Gun gun : guns) {
+			gun.fireGun();
+		}
+	}
+	
+	public void updateAndDraw() {
+		
+	}
 }

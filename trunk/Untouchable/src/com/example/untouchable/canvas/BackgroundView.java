@@ -12,7 +12,7 @@ import android.os.Handler;
 import android.util.AttributeSet;
 import android.view.View;
 
-public class Background extends View {
+public class BackgroundView extends View {
 	private Handler handle;
 	private final int frameRate = 20;
     private Paint p;
@@ -26,7 +26,7 @@ public class Background extends View {
 	 * @param context
 	 * @param attrs
 	 */
-	public Background(Context context, AttributeSet attrs) {
+	public BackgroundView(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		p = new Paint();
 		r = new Random();

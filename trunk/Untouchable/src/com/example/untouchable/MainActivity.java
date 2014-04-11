@@ -47,15 +47,15 @@ public class MainActivity extends Activity {
     			break;*/
     			
     		case R.id.easy:
-    			((StartFragment)frag).setDifficulty(1);
+    			((StartFragment)frag).setDifficulty((short) 1);
     			break;
     			
     		case R.id.normal:
-    			((StartFragment)frag).setDifficulty(2);
+    			((StartFragment)frag).setDifficulty((short) 2);
     			break;
     			
     		case R.id.hard:
-    			((StartFragment)frag).setDifficulty(3);
+    			((StartFragment)frag).setDifficulty((short) 3);
     			break;
 			
     		case R.id.startButton:

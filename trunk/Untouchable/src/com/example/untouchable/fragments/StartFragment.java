@@ -27,7 +27,11 @@ public class StartFragment extends Fragment {
 		return inflater.inflate(R.layout.start, container, false);
 	}
 	
-	public void setDifficulty(int difficulty) {
+	/**
+	 * 
+	 * @param difficulty
+	 */
+	public void setDifficulty(short difficulty) {
     	GameFragment frag = new GameFragment();
     	
     	frag.setDifficulty(difficulty);

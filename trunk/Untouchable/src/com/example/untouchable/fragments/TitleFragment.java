@@ -8,9 +8,7 @@ import android.os.Bundle;
 import android.view.*;
 
 public class TitleFragment extends Fragment {
-    private AlertDialog.Builder instruct;
-	
-	/**
+    /**
      *  @param inflater
      *  @param container
      *  @param savedInstanceState

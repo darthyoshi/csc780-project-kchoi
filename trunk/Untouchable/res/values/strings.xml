@@ -13,6 +13,8 @@
     <string name="normal">Normal</string>
     <string name="difficulty">Select Difficulty</string>
     <string name="easy">Easy</string>
+    <string name="game_over">Game Over</string>
+    <string name="level">Level:</string>
 
     <string name="default_name">Faceless Monkey</string>
         

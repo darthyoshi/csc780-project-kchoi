@@ -7,52 +7,98 @@ package com.example.untouchable.obj;
 import com.example.untouchable.R;
 
 import android.content.Context;
-import android.graphics.BitmapFactory;
-import android.view.SurfaceView;
+import android.graphics.*;
 
 public class Shot extends GameObject {
-	private double bearing;
-	private double speed = 0.;
+	private double bearing, speed = 0.;
+	private static int height, width;
+	private float dx, dy;
+	private Matrix matrix;
+	private float[] values;
+	private RectF bounds;
 	
 	/**
 	 *  Class constructor.
 	 *  @param x the initial x coordinate
 	 *  @param y the initial y coordinate
-	 *  @param bearing the initial bearing
-	 *  @param velocity the initial velocity
+	 *  @param bearing the bearing
+	 *  @param speed the initial speed
 	 */
-	public Shot(int x, int y, double bearing, Context context) {
+	public Shot(int x, int y, double bearing, double speed, Context context) {
 		this.x = x;
 		this.y = y;
 		this.bearing = bearing;
+		this.speed = speed;
+		
 		sprite = BitmapFactory.decodeResource(context.getResources(), R.drawable.sprite_shot);
+		
+		height = sprite.getHeight();
+		width = sprite.getWidth();
+		
+		matrix = new Matrix();
+		matrix.setRotate((float)(Math.toDegrees(bearing)), x, y);
+		matrix.preTranslate(x-width/2, y+2f*height/3);
+		
+		bounds = new RectF(0, 0, 0, 0);
 	}
 
 	/**
 	 * @return the velocity
 	 */
-	public double getVelocity() {
+	public double getSpeed() {
 		return speed;
 	}
 
 	/**
 	 * @param velocity the velocity to set
 	 */
-	public void setVelocity(double velocity) {
-		this.speed = velocity;
+	public void setSpeed(double speed) {
+		this.speed = speed;
 	}
 
 	/**
-	 * @return the bearing
+	 * Updates the position of the Shot and draws the sprite. 
+	 * @param canvas the canvas to draw on
+	 * @param move whether or not the Shot should be moving
 	 */
-	public double getBearing() {
-		return bearing;
+	public void updateAndDraw(Canvas canvas, boolean move) {
+		dx = (float)(speed*Math.sin(bearing));
+		dy = (float)(speed*Math.cos(bearing));
+
+		if(move) {
+			matrix.postTranslate(-dx, dy);
+		}
+		
+		values = new float[9];
+		matrix.getValues(values);
+		x = (int)values[Matrix.MTRANS_X];
+		y = (int)values[Matrix.MTRANS_Y];
+		
+		canvas.drawBitmap(sprite, matrix, null);
+		
+		drawDebugHitbox(canvas);
+	}
+
+	/**
+	 * Draws the debug hitbox.
+	 * @param canvas the canvas to draw on
+	 */
+	protected void drawDebugHitbox(Canvas canvas) {
+		RectF hitbox = getHitbox();
+		Paint paint = new Paint();
+		paint.setColor(Color.argb(128, 255, 0, 255));
+		canvas.drawRect(hitbox, paint);	
 	}
 	
 	/**
-	 * @param bearing the bearing to set
+	 * Returns the current hitbox of the Shot.
+	 * @return a RectF that defines the bounds of the hitbox
 	 */
-	public void setBearing(double bearing) {
-		this.bearing = bearing;
+	public RectF getHitbox() {
+		bounds.set(0, height/2, width, height);
+		
+		matrix.mapRect(bounds);
+		
+		return bounds;
 	}
 }
