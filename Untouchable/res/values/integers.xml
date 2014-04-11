@@ -3,25 +3,25 @@
     
     <integer-array name="values">
         <item>10000000</item>
-		<item>7500000</item>
+		<item>9000000</item>
+		<item>8000000</item>
+		<item>7000000</item>
+		<item>6000000</item>
 		<item>5000000</item>
-		<item>2500000</item>
+		<item>4000000</item>
+		<item>3000000</item>
+		<item>2000000</item>
 		<item>1000000</item>
-		<item>750000</item>
+		<item>900000</item>
+		<item>800000</item>
+		<item>700000</item>
+		<item>600000</item>
 		<item>500000</item>
-		<item>250000</item>
+		<item>400000</item>
+		<item>300000</item>
+		<item>200000</item>
 		<item>100000</item>
-		<item>75000</item>
-		<item>50000</item>
-		<item>25000</item>
-		<item>10000</item>
-		<item>7500</item>
-		<item>5000</item>
-		<item>2500</item>
-		<item>1000</item>
-		<item>750</item>
-		<item>500</item>
-		<item>250</item>
+		<item>90000</item>
     </integer-array>
     
 </resources>

@@ -15,10 +15,13 @@ import android.app.*;
 import android.content.Context;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.text.Layout;
 import android.view.*;
+import android.widget.*;
+import android.widget.LinearLayout.LayoutParams;
 
 public class HiScoreFragment extends Fragment {
-    private SortedMap<Integer, String> scoreList = null;
+    private TreeMap<Integer, String> scoreList = null;
     
     @Override
     public void onResume() {
@@ -30,7 +33,7 @@ public class HiScoreFragment extends Fragment {
 	    	BufferedReader reader = null;
 	    	try {
 	    		reader = new BufferedReader(new InputStreamReader(getActivity().openFileInput("myscores.txt")));
-	    		
+
 	    		String line;
 		    	String[] words;
 	    		while((line = reader.readLine()) != null) {
@@ -49,10 +52,42 @@ public class HiScoreFragment extends Fragment {
 	    			scoreList.put(scores[i], res.getString(R.string.default_name));
 	    		}
 	    	}
-	    	
+    	}
 
-	    	
-	    	//TODO: create and populate TextViews
+		TableLayout table = (TableLayout)(getActivity().findViewById(R.id.score_list));
+		
+		TableRow row;
+		TextView num, score, name;
+    	Iterator<Integer> iter = scoreList.descendingKeySet().iterator();
+    	Activity parent = getActivity();
+    	
+    	for(int i = 1; i <= scoreList.size(); i++) {
+    		int key = iter.next();
+    		
+    		row = new TableRow(parent);
+    		row.setLayoutMode(TableLayout.LayoutParams.MATCH_PARENT);
+    		
+    		num = new TextView(parent);
+    		num.setText(Integer.toString(i) + '.');
+    		num.setTextColor(getResources().getColor(R.color.white));
+    		num.setPadding(0, 0, 15, 0);
+    		num.setTextSize(17);
+    	
+    		score = new TextView(parent);
+    		score.setText(Integer.toString(key));
+    		score.setTextColor(getResources().getColor(R.color.white));
+    		score.setTextSize(17);
+    		
+    		name = new TextView(parent);
+    		name.setText(scoreList.get(key));
+    		name.setTextColor(getResources().getColor(R.color.white));
+    		name.setTextSize(17);
+    		
+    		row.addView(num);
+    		row.addView(score);
+    		row.addView(name);
+    		
+    		table.addView(row);
     	}
     }
     

@@ -6,29 +6,31 @@
 package com.example.untouchable.fragments;
 
 import com.example.untouchable.*;
-import com.example.untouchable.canvas.Foreground;
-import com.example.untouchable.obj.*;
+import com.example.untouchable.canvas.ForegroundView;
 
 import android.app.*;
-import android.app.AlertDialog.Builder;
-import android.content.Context;
-import android.content.DialogInterface;
+import android.content.*;
+import android.content.res.TypedArray;
 import android.hardware.*;
 import android.os.Bundle;
 import android.view.*;
 import android.widget.*;
 
 public class GameFragment extends Fragment implements SensorEventListener {
-	private TextView lblX, lblX2;
-	private TextView lblY, lblY2;
-	private TextView lblZ, lblZ2;
-	private Float xInit, yInit, zInit;
-	int dX, dY, dZ;
+	private float xInit, yInit;
+	private float dX, dY, dZ;
 	private boolean init = false;
-	private int difficulty;
+	private short difficulty, azimuth, altitude;
+	private int score = 0, level;
+	private ForegroundView fg;
+	private TextView scoreBox;
+	private TypedArray enemyIds;
+	private static SensorManager sensorManager;
 	
-	private Foreground fg;
-	
+/*	//for debug
+	private float zInit, initAz, initAl;
+	private TextView lblX, lblX2, lblY, lblY2, lblZ, lblZ2, lblAz, lblAz2, lblAl, lblAl2;
+*/
 	/**
      *  @param inflater
      *  @param container
@@ -44,80 +46,120 @@ public class GameFragment extends Fragment implements SensorEventListener {
 	}
 	
 	
-	public void init() {
+	private void init() {
+		init = false;
+		
 		Activity parent = getActivity();
 		
-		fg = (Foreground)parent.findViewById(R.id.fg);
+		enemyIds = parent.getResources().obtainTypedArray(R.array.enemy_sprites);
 		
-		lblX = (TextView)parent.findViewById(R.id.lblX);
-		lblY = (TextView)parent.findViewById(R.id.lblY);
-		lblZ = (TextView)parent.findViewById(R.id.lblZ);
+		fg = (ForegroundView)parent.findViewById(R.id.fg);
 		
-		lblX2 = (TextView)parent.findViewById(R.id.initX);
-		lblY2 = (TextView)parent.findViewById(R.id.initY);
-		lblZ2 = (TextView)parent.findViewById(R.id.initZ);
+		scoreBox = (TextView)parent.findViewById(R.id.score);
+		scoreBox.bringToFront();
 		
+		parent.findViewById(R.id.lvl_label).bringToFront();
+		
+		parent.findViewById(R.id.start_timer).bringToFront();
+/*
+		{	//for debug
+			lblX = (TextView)parent.findViewById(R.id.lblX);
+			lblY = (TextView)parent.findViewById(R.id.lblY);
+			lblZ = (TextView)parent.findViewById(R.id.lblZ);
+			
+			lblX2 = (TextView)parent.findViewById(R.id.initX);
+			lblY2 = (TextView)parent.findViewById(R.id.initY);
+			lblZ2 = (TextView)parent.findViewById(R.id.initZ);
+			
+			lblAl = (TextView)parent.findViewById(R.id.lblAl);
+			lblAz = (TextView)parent.findViewById(R.id.lblAz);
+			
+			lblAl2 = (TextView)parent.findViewById(R.id.initAl);
+			lblAz2 = (TextView)parent.findViewById(R.id.initAz);
+		}
+*/
         /*
          * Retrieve the SensorManager.
          */
-        SensorManager sensorManager = (SensorManager) parent.getSystemService(Context.SENSOR_SERVICE);
-        /*
-         * Retrieve the default Sensor for the accelerometer.
-         */
-        Sensor sensorAccelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        sensorManager = (SensorManager) parent.getSystemService(Context.SENSOR_SERVICE);
         /*
          * Register this activity as the listener for accelerometer events.
          */
-        sensorManager
-                .registerListener(this, sensorAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+        sensorManager.registerListener(
+        		this,
+        		sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
+        		SensorManager.SENSOR_DELAY_NORMAL);
+        
+        fg.initParams(difficulty, level, getActivity());
+		
+		setScoreDisplay();
 	}
 	
 	@Override
 	public void onResume() {
 		super.onResume();
 		init();
-		init = false;
 	}
-	
-	@Override
-	public void onAccuracyChanged(Sensor sensor, int accuracy) {
-		// TODO Auto-generated method stub
 
-	}
+	@Override
+	public void onAccuracyChanged(Sensor sensor, int accuracy) {}
 
 	@Override
 	public void onSensorChanged(SensorEvent event) {
 		if(!init) {
 			init = true;
-			
+		
 			xInit = event.values[0];
 			yInit = event.values[1];
-			zInit = event.values[2];
 
-			lblX2.setText(Float.toString(xInit));
-			lblY2.setText(Float.toString(yInit));
-			lblZ2.setText(Float.toString(zInit));
-		}
+/*			{	//for debug
+ 				zInit = event.values[2];
+	
+				initAz = (float) Math.atan2(xInit, yInit);
+				initAl = (float)(Math.atan2(zInit, Math.sqrt(xInit*xInit+yInit*yInit)) + Math.PI/2);
+	
+				lblX2.setText(Float.toString(-xInit));
+				lblY2.setText(Float.toString(-yInit));
+				lblZ2.setText(Float.toString(-zInit));
+				
+				lblAz2.setText(Float.toString(initAz));
+				lblAl2.setText(Float.toString(initAl));
+			}
+*/		}
 		
 		else {
-			dX = (int) (xInit - event.values[0]);
-			dY = (int) (event.values[1] - yInit);
-			dZ = (int) (event.values[2] - zInit);
+			dX = xInit - event.values[0];
+			dY = yInit - event.values[1];
+			dZ = event.values[2];
 			
-			lblX.setText(Float.toString(dX));
-			lblY.setText(Float.toString(dY));
-			lblZ.setText(Float.toString(dZ));
-			
-			fg.getPlayer().setSpeed(dX, dY, dZ);
+			azimuth = (short)Math.toDegrees(Math.atan2(dX, dY));
+			altitude = (short)Math.toDegrees((Math.atan2(dZ, Math.sqrt(dX*dX+dY*dY)) - Math.PI/2));
+/*
+			{	//for debug
+				lblX.setText(Float.toString(dX));
+				lblY.setText(Float.toString(dY));
+				lblZ.setText(Float.toString(dZ));
+	
+				lblAz.setText(Integer.toString(azimuth));
+				lblAl.setText(Integer.toString(altitude));
+			}
+*/
+			fg.getPlayer().setSpeed(Math.toRadians(azimuth), Math.toRadians(altitude));
 		}
 
 	}
 
+	@Override
+	public void onPause() {
+		super.onPause();
+		sensorManager.unregisterListener(this);
+		fg.pause();
+	}
 
 	/**
 	 * @return the difficulty
 	 */
-	public int getDifficulty() {
+	public short getDifficulty() {
 		return difficulty;
 	}
 
@@ -125,31 +167,58 @@ public class GameFragment extends Fragment implements SensorEventListener {
 	/**
 	 * @param difficulty the difficulty to set
 	 */
-	public void setDifficulty(int difficulty) {
+	public void setDifficulty(short difficulty) {
 		this.difficulty = difficulty;
 	}
 	
 	public void onBackPressed() {
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 		
+		fg.pause();
+		
 		builder.setMessage("Do you really wish to quit?\n\nYour score will be lost!")
-			.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+			.setNegativeButton("Resume", new DialogInterface.OnClickListener() {
 			
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
+					fg.resume();
+
 					dialog.dismiss();
-					
 				}
 			})
 			.setTitle("Quit")
-			.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+			.setPositiveButton("Quit", new DialogInterface.OnClickListener() {
 				
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					getActivity().getFragmentManager().popBackStackImmediate();
 				}
-			});
+			})
+			.setCancelable(false);
 		AlertDialog dialog = builder.create();
 		dialog.show();
+	}
+
+
+	/**
+	 * @return the score
+	 */
+	public int getScore() {
+		return score;
+	}
+
+
+	/**
+	 * @param score the score to set
+	 */
+	public void setScore(int score) {
+		this.score = score;
+	}
+	
+	/**
+	 * Updates the score display on the screen.
+	 */
+	private void setScoreDisplay() {
+		scoreBox.setText(Integer.toString(score));
 	}
 }
