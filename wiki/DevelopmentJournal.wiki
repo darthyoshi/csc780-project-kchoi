@@ -31,3 +31,7 @@
   * Player fires cannon when charge meter is full.
   * Tapping screen fires EMP, and Shots are removed when within EMP radius.
   * Tapping pause button pauses game.
+
+14 Apr 2014
+  * Created Enemy sprites.
+  * Split existing Player sprite into ship and exhaust sprites.
