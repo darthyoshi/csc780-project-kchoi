@@ -1,41 +1,48 @@
 package com.example.untouchable.canvas;
 
 import java.util.*;
+
 import android.annotation.SuppressLint;
-import android.app.Activity;
+import android.app.*;
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.*;
+import android.graphics.Paint.Align;
+import android.media.*;
 import android.util.AttributeSet;
 import android.view.*;
-import android.widget.TextView;
-
 import com.example.untouchable.R;
+import com.example.untouchable.fragments.GameFragment;
 import com.example.untouchable.obj.*;
 
 @SuppressLint("WrongCall")
 public class ForegroundView extends SurfaceView implements SurfaceHolder.Callback {
-	private static Player player;
-	private Enemy enemy;
+	private static Player player = null;
+	private static Enemy enemy;
 	private ArrayList<Shot> shots;
 	private GameLoopThread gameLoopThread;
 	private short difficulty = 2, frame = 0;
-	private int level, playTime = 0;
+	private int level, playTime = 0, score;
 	private long startTime;
-	private boolean init = true, emp = false, isPaused = true, lvlClear = false;
+	private boolean init = true, isPaused = true, lvlClear = false, gameOver = false;
 	private static Rect blank = null;
-	private static Paint paint = null;
+	private static Paint erase = null;
 	private Iterator<Shot> iter;
 	private Shot shot;
 	private Rect meter, pauseDest, pauseSrc;
-	private Paint meterPaint = null;
-	private ArrayList<Gun> guns;
-	private Bitmap pause;
-	private RectF playerHitbox, shotHitbox, empBox;
+	private Paint meterPaint = null, textPaint = null;
+	private ArrayList<Gun> guns = null;
+	private Bitmap pauseButton;
+	private RectF playerHitbox, shotHitbox;
 	private Point playerCenter;
 	private float charge = 0f;
 	private Context context;
+	private int[] enemyIds;
+	private SoundPool sounds;
+	private HashMap<String, Integer> soundLbls;
 	
-	private Point gunCenter;
+	//for debug
+//	private Point gunCenter;
 		
 	/**
 	 * Class constructor.
@@ -70,18 +77,27 @@ public class ForegroundView extends SurfaceView implements SurfaceHolder.Callbac
 		    @Override
             public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) { }
         });
-		
-		player = new Player(getContext());
-		
-		guns = new ArrayList<Gun>();
-		for(short i = 0; i < 5; i++) {
-			guns.add(new Gun((int)(Math.random()*400), (int)(Math.random()*1000), i, getContext()));
-		}
-		
+				
 		shots = new ArrayList<Shot>();
 		
-		pause = BitmapFactory.decodeResource(context.getResources(), R.drawable.pause);
-		pauseSrc = new Rect(0, 0, pause.getWidth(), pause.getHeight());
+		pauseButton = BitmapFactory.decodeResource(context.getResources(), R.drawable.pause);
+		pauseSrc = new Rect(0, 0, pauseButton.getWidth(), pauseButton.getHeight());
+		
+		sounds = new SoundPool(50, AudioManager.STREAM_MUSIC, 0);
+		
+		TypedArray soundIds = context.getResources().obtainTypedArray(R.array.sound_ids);
+		
+		soundLbls = new HashMap<String, Integer>();
+		
+		String[] tmp;
+		
+		for(short i = 0; i < soundIds.length(); i++) {
+			tmp = context.getResources().getResourceName(soundIds.getResourceId(i, 0)).split("/");
+			
+			soundLbls.put(tmp[1], sounds.load(context, soundIds.getResourceId(i, 0), 1));
+		}
+		
+		soundIds.recycle();
 	}
 	
 	/**
@@ -102,21 +118,56 @@ public class ForegroundView extends SurfaceView implements SurfaceHolder.Callbac
             }
         }
         
-        togglePauseStatus();
+        setPauseStatus(true);
 	}
 	
 	/**
 	 * Resumes the game execution thread.
 	 */
 	public void resume() {
-		blank = new Rect(0, 0, getWidth(), getHeight());
+		if(enemy == null) {
+			enemy = new Enemy(0, context, sounds, soundLbls);
+		}
+		
+		else if(init) {
+			enemy.init();
+		}
+		
+		if(player == null) {
+			player = new Player(context, sounds, soundLbls);
+		}
+		
+		else if(init) {
+			player.init();
+		}
+			
+		if(guns == null) {
+			guns = enemy.getGuns();
 
-		paint = new Paint();
-		paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+			for(Gun gun : guns) {
+				gun.setDifficulty(difficulty);
+			}
+		}
+		
+		if(blank == null) {
+			blank = new Rect(0, 0, getWidth(), getHeight());
+		}
+		
+		if(erase == null) {
+			erase = new Paint();
+			erase.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+		}
 
-		meterPaint = new Paint();
+		if(meterPaint == null) {
+			meterPaint = new Paint();
+		}
+		
+		if(textPaint == null) {
+			textPaint = new Paint();
+			textPaint.setColor(Color.WHITE);
+		}
 
-		pauseDest = new Rect(getWidth() - 10 - pause.getWidth(), 10, getWidth() - 10, 10 + pause.getHeight());
+		pauseDest = new Rect(getWidth() - 10 - pauseButton.getWidth(), 10, getWidth() - 10, 10 + pauseButton.getHeight());
 		
     	if(gameLoopThread.getState() == Thread.State.TERMINATED) {
     		gameLoopThread = new GameLoopThread(this);
@@ -127,7 +178,7 @@ public class ForegroundView extends SurfaceView implements SurfaceHolder.Callbac
 			gameLoopThread.start();
     	}
 		
-		togglePauseStatus();
+		setPauseStatus(false);
 	}
 
 	/**
@@ -136,33 +187,30 @@ public class ForegroundView extends SurfaceView implements SurfaceHolder.Callbac
 	@Override
 	protected void onDraw(Canvas canvas) {
 		if(canvas != null) {
-			if(init && System.currentTimeMillis() - startTime > 3000) {
-				startTime += 3000;
-				init = false;
-			}
-			
 			frame = (short) ((++frame) % (25 - 3*difficulty));
 
-			canvas.drawRect(blank, paint);
+			canvas.drawRect(blank, erase);
 			
-			player.updateAndDraw(canvas, !isPaused && !init);
+			enemy.update(canvas.getHeight());
+		
+			player.update(canvas.getWidth(), canvas.getHeight(), !isPaused && !init && !gameOver);
 			
-			if(frame == 0 && !init && !isPaused) {
-				for(short i = 0; i < guns.size(); i++) {
-					shots.addAll(guns.get(i).fireGun());
-				}
+			if(!init && !isPaused && !lvlClear) {
+				shots.addAll(enemy.fireGuns());
 			}	
 			
 			playerCenter = player.getCenter();
 			
-			
 			iter = shots.iterator();
 			while(iter.hasNext()) {
 				shot = iter.next();
-				shot.updateAndDraw(canvas, !isPaused);
+				shot.update(!isPaused);
 				
-				if(checkForHit(shot)) {
+				if(!gameOver && checkForHit(shot)) {
 					//TODO: handle game over
+					player.startExplosion();
+					
+					gameOver = true;
 				}
 				
 				else if(shot.getX() > canvas.getWidth()+25 || shot.getX() < -25 ||
@@ -173,40 +221,89 @@ public class ForegroundView extends SurfaceView implements SurfaceHolder.Callbac
 				}
 			}		
 			
-			for(short i = 0; i < guns.size(); i++) {
-				guns.get(i).setBearing(playerCenter.x, playerCenter.y);
-				guns.get(i).updateAndDraw(canvas);
+			enemy.draw(canvas);
+			
+			for(Gun gun : guns) {
+				gun.setBearing(playerCenter.x, playerCenter.y);
+				gun.update();
+				gun.draw(canvas);
 				
-				{	//for debug
-					gunCenter = guns.get(i).getCenter();
+/*				{	//for debug
+					gunCenter = gun.getCenter();
 					paint.setStrokeWidth(2);
 					canvas.drawLine(gunCenter.x, gunCenter.y, playerCenter.x, playerCenter.y, paint);
 				}
-			}
+*/			}
 			
-			if(emp) {
-				emp = player.updateAndDrawEMP(canvas);
+			player.draw(canvas);
+			
+			for(Shot shot : shots) {
+				shot.draw(canvas);
 			}
 			
 			updateAndDrawCharge(canvas);
 			
-			canvas.drawBitmap(pause, pauseSrc, pauseDest, null);
+			canvas.drawBitmap(pauseButton, pauseSrc, pauseDest, null);
+		
+			textPaint.setTextSize(32);
+			textPaint.setTextAlign(Align.LEFT);
+			
+			canvas.drawText("Score:  "+score, canvas.getWidth()*.05f, canvas.getHeight()*.05f, textPaint);
+			
+			textPaint.setTextAlign(Align.CENTER);
+			textPaint.setTextSize(50);
+		
+			if(init) {
+				long curTime = System.currentTimeMillis();
+				
+				canvas.drawText("Level: "+level, canvas.getWidth()/2, (canvas.getHeight() - textPaint.ascent() - textPaint.descent())/2, textPaint);
+				
+				if(curTime - startTime < 1000) {
+					canvas.drawText("3", canvas.getWidth()/2, 0.6f*canvas.getHeight(), textPaint);
+				}
+				
+				else if(curTime - startTime < 2000) {
+					canvas.drawText("2", canvas.getWidth()/2, 0.6f*canvas.getHeight(), textPaint);
+				}
+				
+				else if(curTime - startTime < 3000) {
+					canvas.drawText("1", canvas.getWidth()/2, 0.6f*canvas.getHeight(), textPaint);
+				}
+				
+				else {
+					startTime += 3000;
+					init = false;
+				}
+			}
+			
+			else if(isPaused) {
+				canvas.drawText("PAUSED", canvas.getWidth()/2, (canvas.getHeight() - textPaint.ascent() - textPaint.descent())/2, textPaint);
+			}
+			
+			else if(System.currentTimeMillis() - startTime < 1000) {
+				canvas.drawText("GO!", canvas.getWidth()/2, (canvas.getHeight() - textPaint.ascent() - textPaint.descent())/2, textPaint);
+			}
+			
+			else if(gameOver) {
+				canvas.drawText("GAME OVER", canvas.getWidth()/2, (canvas.getHeight() - textPaint.ascent() - textPaint.descent())/2, textPaint);
+			}
 		}
 	}
 	
 	private boolean checkEMPHit(Shot shot) {
 		boolean result = false;
 		
-		if(emp) {
+		int empR = player.getEMPR();
+		
+		if(empR > 0) {
 			shotHitbox = shot.getHitbox();
-			int empR = player.getEMPR();
 			
 			double dist = Math.sqrt(
 				Math.pow(playerCenter.x - (shotHitbox.right + shotHitbox.left)/2, 2) +
 				Math.pow(playerCenter.y - (shotHitbox.bottom + shotHitbox.top)/2, 2)
 			);
 			
-			if(dist < empR/* && dist > empR - 30*/) {
+			if(dist < empR && dist > empR - 100) {
 				result = true;
 			}
 		}
@@ -222,7 +319,7 @@ public class ForegroundView extends SurfaceView implements SurfaceHolder.Callbac
 		int meterHeight;
 		
 		if(!init) {
-			if(!isPaused) {
+			if(!isPaused && !gameOver) {
 				charge += 1f/(30f*25f);
 			}
 			
@@ -234,7 +331,11 @@ public class ForegroundView extends SurfaceView implements SurfaceHolder.Callbac
 					
 					lvlClear = true;
 				}
-				//TODO: handle level clear
+				
+				else {
+					//TODO: handle level clear
+					enemy.startExplosion();
+				}
 			}
 		
 			meterHeight = (int)(charge*(canvas.getHeight() - 5 - canvas.getHeight()/2));
@@ -289,13 +390,11 @@ public class ForegroundView extends SurfaceView implements SurfaceHolder.Callbac
 		return difficulty;
 	}
 	
-	public void initParams(short difficulty, int level, Activity parent) {
+	public void initParams(short difficulty, int level, int score, int[] enemyIds) {
 		this.difficulty = difficulty;
 		this.level = level;
-		
-		Gun.setDifficulty(difficulty);
-		
-		countdown(parent);
+		this.enemyIds = enemyIds;
+		this.score = score;
 	}
 	
 	public Player getPlayer() {
@@ -388,68 +487,6 @@ public class ForegroundView extends SurfaceView implements SurfaceHolder.Callbac
 		
 	}
 	
-	private void countdown(final Activity parent) {
-	    Thread th = new Thread(new Runnable() {
-	    	
-	        public void run() {
-	        	final TextView timer = (TextView)parent.findViewById(R.id.start_timer);
-	        	
-	        	if(timer.isShown()) {
-		            for(short i = 3; i > 0; i--) {
-		                try {
-		                    Thread.sleep(1000);
-		                } 
-		                
-		                catch (InterruptedException e) {
-		                    e.printStackTrace();
-		                }           
-		               
-		                parent.runOnUiThread(new Runnable() {
-		                	
-		                    @Override
-		                    public void run() {
-		                    	try {
-			                    	short i = (short) (Short.parseShort((String) timer.getText()) - 1);
-			                    	timer.setText(Short.toString(i));
-		                    	}
-		                    	
-		                    	catch (Exception e) {}
-		                    }
-		                });
-		            }
-		            
-		            parent.runOnUiThread(new Runnable() {
-	                	
-	                    @Override
-	                    public void run() {
-	                    	parent.findViewById(R.id.lvl_label).setVisibility(View.INVISIBLE);
-	                    	timer.setText("GO!");
-	                    }
-	                });
-		            
-		            try {
-						Thread.sleep(1000);
-					}
-		            
-		            catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-		            
-		            parent.runOnUiThread(new Runnable() {
-	                	
-	                    @Override
-	                    public void run() {
-	                    	timer.setVisibility(View.GONE);
-	                    }
-	                });
-	            
-		        }
-	        }
-	    });
-	    
-	    th.start();
-	}
-	
 	/**
 	 * Called when the level is complete.
 	 * @return the score for the level
@@ -459,46 +496,48 @@ public class ForegroundView extends SurfaceView implements SurfaceHolder.Callbac
 		shots.clear();
 		
 		player.init();
-
-		return difficulty*1000*level*playTime;
+//TODO: time multiplier
+		return difficulty * ((1000*level) + (playTime));
 	}
 	
 	@Override
 	public boolean onTouchEvent(MotionEvent e) {
 		if((e.getAction() & MotionEvent.ACTION_MASK) == MotionEvent.ACTION_UP) {
 			if(pauseDest.contains((int)e.getX(), (int)e.getY())) {
-				togglePauseStatus();
+				setPauseStatus(!isPaused);
+				
+				if(!isPaused) {
+			    	FragmentManager fragMan = ((Activity)context).getFragmentManager();
+			    	GameFragment result = (GameFragment)fragMan.findFragmentByTag(fragMan.getBackStackEntryAt(fragMan.getBackStackEntryCount()-1).getName());
+
+			    	result.setInitState(isPaused);
+				}
 			}
 			
 			else if(!isPaused && !init && charge > difficulty*0.1f + 0.2f) {
-				emp = true;
+				player.activateEMP();
 				
-				charge -= (difficulty*0.1f + 0.2f); 
+				charge -= (difficulty*0.1f + 0.2f);
+				
+				sounds.play(soundLbls.get("emp"), .25f, .25f, 1, 0, 1);
 			}
 		}
 		return true;
 	}
 	
-	private void togglePauseStatus() {
-		isPaused = !isPaused;
+	private void setPauseStatus(boolean pause) {
+		isPaused = pause;
 		
 		if(!isPaused) {
-			if(!init) {
-				TextView msg = (TextView)((Activity)context).findViewById(R.id.start_timer);
-				msg.setVisibility(GONE);
-			}
-			
 			playTime += (int)(System.currentTimeMillis() - startTime);
 		}
 
 		else {
-			if(!init) {
-				TextView msg = (TextView)((Activity)context).findViewById(R.id.start_timer);
-				msg.setText("PAUSED");
-				msg.setVisibility(VISIBLE);
-			}
-		
 			startTime = System.currentTimeMillis();
 		}
+	}
+	
+	public void setInit(boolean state) {
+		init = state;
 	}
 }

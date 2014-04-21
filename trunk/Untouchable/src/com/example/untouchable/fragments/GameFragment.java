@@ -23,8 +23,6 @@ public class GameFragment extends Fragment implements SensorEventListener {
 	private short difficulty, azimuth, altitude;
 	private int score = 0, level;
 	private ForegroundView fg;
-	private TextView scoreBox;
-	private TypedArray enemyIds;
 	private static SensorManager sensorManager;
 	
 /*	//for debug
@@ -45,22 +43,24 @@ public class GameFragment extends Fragment implements SensorEventListener {
 		return inflater.inflate(R.layout.game, container, false);
 	}
 	
-	
+	/**
+	 * Initializes the game.
+	 */
 	private void init() {
 		init = false;
 		
 		Activity parent = getActivity();
 		
-		enemyIds = parent.getResources().obtainTypedArray(R.array.enemy_sprites);
+		TypedArray enemyIds = parent.getResources().obtainTypedArray(R.array.enemy_sprites);
+		
+		int[] enemySpriteIds = new int[enemyIds.length()];
+		for(short i = 0; i < enemyIds.length(); i++) {
+			enemySpriteIds[i] = enemyIds.getResourceId(i, 0);
+		}
+		
+		enemyIds.recycle();
 		
 		fg = (ForegroundView)parent.findViewById(R.id.fg);
-		
-		scoreBox = (TextView)parent.findViewById(R.id.score);
-		scoreBox.bringToFront();
-		
-		parent.findViewById(R.id.lvl_label).bringToFront();
-		
-		parent.findViewById(R.id.start_timer).bringToFront();
 /*
 		{	//for debug
 			lblX = (TextView)parent.findViewById(R.id.lblX);
@@ -90,9 +90,7 @@ public class GameFragment extends Fragment implements SensorEventListener {
         		sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
         		SensorManager.SENSOR_DELAY_NORMAL);
         
-        fg.initParams(difficulty, level, getActivity());
-		
-		setScoreDisplay();
+        fg.initParams(difficulty, level, score, enemySpriteIds);
 	}
 	
 	@Override
@@ -181,8 +179,10 @@ public class GameFragment extends Fragment implements SensorEventListener {
 			
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
+					init = false;
+					
 					fg.resume();
-
+		
 					dialog.dismiss();
 				}
 			})
@@ -191,10 +191,13 @@ public class GameFragment extends Fragment implements SensorEventListener {
 				
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
+					fg.setInit(true);
+					
 					getActivity().getFragmentManager().popBackStackImmediate();
 				}
 			})
 			.setCancelable(false);
+		
 		AlertDialog dialog = builder.create();
 		dialog.show();
 	}
@@ -214,11 +217,8 @@ public class GameFragment extends Fragment implements SensorEventListener {
 	public void setScore(int score) {
 		this.score = score;
 	}
-	
-	/**
-	 * Updates the score display on the screen.
-	 */
-	private void setScoreDisplay() {
-		scoreBox.setText(Integer.toString(score));
+
+	public void setInitState(boolean state) {
+		init = state;
 	}
 }
