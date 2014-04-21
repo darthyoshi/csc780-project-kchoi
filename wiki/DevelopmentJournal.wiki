@@ -35,3 +35,10 @@
 14 Apr 2014
   * Created Enemy sprites.
   * Split existing Player sprite into ship and exhaust sprites.
+
+20 Apr 2014
+  * Added freeware sound effects taken from flashfix.com.
+  * Sound effects play when Guns fire, when EMP triggers, when Player fires laser, and when Player is hit.
+  * Moved various event handling algorithms from ForegroundView to Player, Gun, Enemy classes.
+  * Enemy and Guns will move from bottom of screen to top when level starts.
+  * Implemented several different firing patterns.
