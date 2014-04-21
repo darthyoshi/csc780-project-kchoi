@@ -4,10 +4,13 @@
  */
 package com.example.untouchable.obj;
 
+import java.util.HashMap;
+
 import com.example.untouchable.R;
 
 import android.content.Context;
 import android.graphics.*;
+import android.media.SoundPool;
 
 public class Shot extends GameObject {
 	private double bearing, speed = 0.;
@@ -24,12 +27,14 @@ public class Shot extends GameObject {
 	 *  @param bearing the bearing
 	 *  @param speed the initial speed
 	 */
-	public Shot(int x, int y, double bearing, double speed, Context context) {
+	public Shot(int x, int y, double bearing, double speed, Context context, SoundPool sounds, HashMap<String, Integer> soundLbls) {
+		super(context, sounds, soundLbls);
+		
 		this.x = x;
 		this.y = y;
 		this.bearing = bearing;
 		this.speed = speed;
-		
+
 		sprite = BitmapFactory.decodeResource(context.getResources(), R.drawable.sprite_shot);
 		
 		height = sprite.getHeight();
@@ -61,7 +66,7 @@ public class Shot extends GameObject {
 	 * @param canvas the canvas to draw on
 	 * @param move whether or not the Shot should be moving
 	 */
-	public void updateAndDraw(Canvas canvas, boolean move) {
+	public void update(boolean move) {
 		dx = (float)(speed*Math.sin(bearing));
 		dy = (float)(speed*Math.cos(bearing));
 
@@ -73,10 +78,12 @@ public class Shot extends GameObject {
 		matrix.getValues(values);
 		x = (int)values[Matrix.MTRANS_X];
 		y = (int)values[Matrix.MTRANS_Y];
-		
+	}
+	
+	public void draw(Canvas canvas) {
 		canvas.drawBitmap(sprite, matrix, null);
 		
-		drawDebugHitbox(canvas);
+	//	drawDebugHitbox(canvas);
 	}
 
 	/**

@@ -5,20 +5,17 @@
 
 package com.example.untouchable.fragments;
 
+import java.io.*;
 import java.util.*;
 import java.util.Map.Entry;
-import java.io.*;
-
-import com.example.untouchable.*;
 
 import android.app.*;
 import android.content.Context;
-import android.content.res.Resources;
 import android.os.Bundle;
-import android.text.Layout;
 import android.view.*;
 import android.widget.*;
-import android.widget.LinearLayout.LayoutParams;
+
+import com.example.untouchable.R;
 
 public class HiScoreFragment extends Fragment {
     private TreeMap<Integer, String> scoreList = null;
@@ -29,27 +26,39 @@ public class HiScoreFragment extends Fragment {
     	
     	if(scoreList == null) {
 	    	scoreList = new TreeMap<Integer, String>();
-	    	
+
 	    	BufferedReader reader = null;
 	    	try {
 	    		reader = new BufferedReader(new InputStreamReader(getActivity().openFileInput("myscores.txt")));
-
-	    		String line;
-		    	String[] words;
-	    		while((line = reader.readLine()) != null) {
-					words = line.split(",");
-					
-					scoreList.put(Integer.getInteger(words[0]), words[1]);
-				}
-			}
+    		}
 	    	
 	    	catch(Exception e) {
-	    		Resources res = getActivity().getResources();
-	    		
-	    		int scores[] = res.getIntArray(R.array.values);
-	    		
-	    		for(int i = 0; i < scores.length; i++) {
-	    			scoreList.put(scores[i], res.getString(R.string.default_name));
+		    	try {
+		    		reader = new BufferedReader(new InputStreamReader(getActivity().getAssets().open("scores.txt")));
+		    	}
+		    	
+	    		catch(Exception e1) {
+	    			e1.printStackTrace();
+	    		}
+	    	}
+	    	
+	    	finally {
+	    		if(reader != null) {
+	    			try {
+			    		String line;
+				    	String[] words;
+			    		while((line = reader.readLine()) != null) {
+			    			words = line.split(",");
+			    			
+							scoreList.put(Integer.parseInt(words[0]), words[1]);
+						}
+		
+			    		reader.close();
+					}
+	    			
+	    			catch (IOException e) {
+						e.printStackTrace();
+					}
 	    		}
 	    	}
     	}

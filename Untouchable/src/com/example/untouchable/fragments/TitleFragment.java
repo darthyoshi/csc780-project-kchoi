@@ -3,7 +3,6 @@ package com.example.untouchable.fragments;
 import com.example.untouchable.*;
 
 import android.app.*;
-import android.content.*;
 import android.os.Bundle;
 import android.view.*;
 

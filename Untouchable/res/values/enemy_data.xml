@@ -1,37 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string-array name="enemy_sprites">
-        <item>@drawable/sprite_enemy_1</item>
-        <item>@drawable/sprite_enemy_2</item>
-        <item>@drawable/sprite_enemy_3</item>
-        <item>@drawable/sprite_enemy_4</item>
-        <item>@drawable/sprite_enemy_5</item>    
-    </string-array>
+    <array name="enemy_sprites">
+        <item>@array/sprite_enemy_1</item>
+        <item>@array/sprite_enemy_2</item>
+        <item>@array/sprite_enemy_3</item>
+        <item>@array/sprite_enemy_4</item>
+        <item>@array/sprite_enemy_5</item>    
+    </array>
     
-    <integer-array name="gun_location_1">
-        <item>0</item>
-        <item>0</item>
-    </integer-array>
+    <array name="sprite_enemy_1">
+        <item>@drawable/sprite_enemy_1_ship</item>
+        <item>@drawable/sprite_enemy_1_exhaust</item>
+    </array>
+
+    <array name="sprite_enemy_2">
+        <item>@drawable/sprite_enemy_2_ship</item>
+        <item>@drawable/sprite_enemy_2_exhaust</item>
+    </array>
     
-    <integer-array name="gun_location_2">
-        <item>0</item>
-        <item>0</item>
-    </integer-array>
+    <array name="sprite_enemy_3">
+        <item>@drawable/sprite_enemy_3_ship</item>
+        <item>@drawable/sprite_enemy_3_exhaust</item>
+    </array>
     
-    <integer-array name="gun_location_3">
-        <item>0</item>
-        <item>0</item>
-    </integer-array>
+    <array name="sprite_enemy_4">
+        <item>@drawable/sprite_enemy_4_ship</item>
+        <item>@drawable/sprite_enemy_4_exhaust</item>
+    </array>
     
-    <integer-array name="gun_location_4">
-        <item>0</item>
-        <item>0</item>
-    </integer-array>
-    
-    <integer-array name="gun_location_5">
-        <item>0</item>
-        <item>0</item>
-    </integer-array>
-    
+    <array name="sprite_enemy_5">
+        <item>@drawable/sprite_enemy_5_ship</item>
+        <item>@drawable/sprite_enemy_5_exhaust</item>
+    </array>
+   
 </resources>

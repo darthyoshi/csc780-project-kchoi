@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <array name="sound_ids">
+        <item>@raw/gunfire</item>
+        <item>@raw/beamfire</item>
+        <item>@raw/explosion_short</item>
+        <item>@raw/explosion_long</item>
+        <item>@raw/emp</item>
+    </array>
+    
+</resources>

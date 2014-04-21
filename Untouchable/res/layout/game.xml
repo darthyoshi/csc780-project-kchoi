@@ -8,28 +8,7 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:id="@+id/fg" />
-    
-    <TextView
-        android:id="@+id/score_lbl"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
-        android:layout_marginTop="10dp"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:text="Score: "
-        android:textColor="@color/white" />
-    
-    <TextView 
-        android:id="@+id/score"
-        android:text="0"
-        android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        android:layout_marginTop="10dp"
-        android:layout_marginLeft="10dp"
-        android:layout_toRightOf="@+id/score_lbl"
-        android:textColor="@color/white" />
-    
+        
    	<!-- TableLayout 
    	    android:layout_below="@+id/score_lbl"
 	    android:layout_width="fill_parent"
@@ -82,45 +61,6 @@
                 android:text="n.a." android:textColor="@color/white" />
         </TableRow>
 	    
-    </TableLayout -->
-
-   	<RelativeLayout
-   	    android:id="@+id/lvl_label"
-   	    android:layout_width="wrap_content"
-   	    android:layout_height="wrap_content"
-   	    android:layout_centerInParent="true" >
-    
-        <TextView
-            android:id="@+id/level"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/level"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:textColor="@color/white"
-            android:visibility="visible" />
-    
-	    <TextView
-	        android:id="@+id/lvlnum"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:layout_toRightOf="@+id/level"
-	        android:layout_marginLeft="15dp"
-	        android:text="1"
-	        android:textAppearance="?android:attr/textAppearanceLarge"
-	        android:textColor="@color/white"
-	        android:visibility="visible" />
-   	    
-   	</RelativeLayout>
-    
-    <TextView 
-        android:id="@+id/start_timer"
-        android:text="3"
-        android:textColor="@color/white"
-        android:layout_below="@+id/lvl_label"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:layout_centerHorizontal="true" />    
+    </TableLayout --> 
     
 </RelativeLayout>
