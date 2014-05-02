@@ -56,3 +56,4 @@
   * Player EMP activated with multi-touch screen tap.
   * Sound IDs retrieved when GameFragment loads, rather than when initializing ForegroundView.
   * Added init() methods to Enemy, Player, Gun objects.
+  * Doubled Player and Enemy exhaust framerates.
