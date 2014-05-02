@@ -7,7 +7,9 @@ package com.example.untouchable;
 
 import android.app.*;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.*;
+
 import com.example.untouchable.fragments.*;
 
 public class MainActivity extends Activity {
@@ -31,6 +33,10 @@ public class MainActivity extends Activity {
         	.addToBackStack("TITLE_FRAGMENT")
         	.show(frag)
         	.commit();
+        
+        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+        
+        setTheme(android.R.style.Theme_Black_NoTitleBar_Fullscreen);
 	}
     
     /**
@@ -42,24 +48,8 @@ public class MainActivity extends Activity {
 
 		int viewId = v.getId();
     	switch(viewId) {
-/*    		case R.id.doneButton:
-    			getFragmentManager().popBackStackImmediate("TITLE_FRAGMENT", 0);
-    			break;*/
-    			
-    		case R.id.easy:
-    			((StartFragment)frag).setDifficulty((short) 1);
-    			break;
-    			
-    		case R.id.normal:
-    			((StartFragment)frag).setDifficulty((short) 2);
-    			break;
-    			
-    		case R.id.hard:
-    			((StartFragment)frag).setDifficulty((short) 3);
-    			break;
-			
     		case R.id.startButton:
-    		case R.id.instructButton:
+    		case R.id.optionButton:
     		case R.id.scoresButton:
     			((TitleFragment)frag).onClick(v);
         		break;

@@ -30,20 +30,23 @@ public class TitleFragment extends Fragment {
     	String tag = null;
     	
     	switch(v.getId()) {
-    		case R.id.startButton:
-				tag = "START_FRAGMENT";
-				frag = new StartFragment();
-				break;
-				
-    		case R.id.scoresButton:
-				tag = "SCORE_FRAGMENT";
-				frag = new HiScoreFragment();
-				break;
-				
-    		case R.id.instructButton:
-    			tag = "INSTRUCT_FRAGMENT";
-    			frag = new InstructionFragment();
-    			break;
+		case R.id.startButton:
+			tag = "GAME_FRAGMENT";
+			frag = new GameFragment();
+			
+			break;
+			
+		case R.id.scoresButton:
+			tag = "SCORE_FRAGMENT";
+			frag = new HiScoreFragment();
+			
+			break;
+			
+		case R.id.optionButton:
+			tag = "PREFERENCE_FRAGMENT";
+			frag = new PreferencesFragment();
+			
+			break;
     	}
     	
     	getFragmentManager()

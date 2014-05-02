@@ -20,6 +20,12 @@ public abstract class GameObject {
 	protected SoundPool sounds;
 	protected HashMap<String, Integer> soundLbls;
 	
+	/**
+	 * Class constructor.
+	 * @param context the execution context
+	 * @param sounds
+	 * @param soundLbls
+	 */
 	public GameObject(Context context, SoundPool sounds, HashMap<String, Integer> soundLbls) {
 		this.context = context;
 		this.sounds = sounds;

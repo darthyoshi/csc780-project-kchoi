@@ -26,6 +26,9 @@ public class Shot extends GameObject {
 	 *  @param y the initial y coordinate
 	 *  @param bearing the bearing
 	 *  @param speed the initial speed
+	 *  @param context the execution context
+	 *  @param sounds the sound effects
+	 *  @param the sound effect IDs
 	 */
 	public Shot(int x, int y, double bearing, double speed, Context context, SoundPool sounds, HashMap<String, Integer> soundLbls) {
 		super(context, sounds, soundLbls);
@@ -63,7 +66,7 @@ public class Shot extends GameObject {
 
 	/**
 	 * Updates the position of the Shot and draws the sprite. 
-	 * @param canvas the canvas to draw on
+	 * @param canvas the drawing surface
 	 * @param move whether or not the Shot should be moving
 	 */
 	public void update(boolean move) {
@@ -88,7 +91,7 @@ public class Shot extends GameObject {
 
 	/**
 	 * Draws the debug hitbox.
-	 * @param canvas the canvas to draw on
+	 * @param canvas the drawing surface
 	 */
 	protected void drawDebugHitbox(Canvas canvas) {
 		RectF hitbox = getHitbox();
