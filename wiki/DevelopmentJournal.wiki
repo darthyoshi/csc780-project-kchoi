@@ -1,6 +1,6 @@
 #summary Project development journal.
 
-= March =
+= March 2014 =
 
 11 Mar 2014
   * Created title screen.
@@ -18,12 +18,14 @@
   * Reorganized classes into packages.
   * Created `Foreground` class as `SurfaceView` extension and added to `GameFragment`.
 
+= April 2014 =
+
 2 Apr 2014 
   * Added `Shot` and `Gun` sprites.
   * `Player` and `Gun` appear on stage and update in response to accelerometer values.
 
 10 Apr 2014
-  * Accelerometer controls take store initial x and y values as zero when GameFragment.resume() is called.
+  * Accelerometer controls store initial x and y values as zero when GameFragment.resume() is called.
   * High scores display properly.
   * All Java import declarations reorganized.
   * Shot and Player track hitboxes.
@@ -42,3 +44,15 @@
   * Moved various event handling algorithms from ForegroundView to Player, Gun, Enemy classes.
   * Enemy and Guns will move from bottom of screen to top when level starts.
   * Implemented several different firing patterns.
+
+= May 2014 =
+1 May 2014
+  * Replaced InstructionFragment with PreferencesFragment.
+  * PreferencesFragment uses SharedPreferences to track control style (tilt or touch) and difficulty level.
+  * Removed StartFragment.
+  * Streamlined level start countdown to remove if switch.
+  * Enemy updates Gun positions while in motion.
+  * Implemented touch controls. Currently ship will follow position of finger.
+  * Player EMP activated with multi-touch screen tap.
+  * Sound IDs retrieved when GameFragment loads, rather than when initializing ForegroundView.
+  * Added init() methods to Enemy, Player, Gun objects.
