@@ -5,12 +5,12 @@
 
 package com.example.untouchable.obj;
 
-import java.util.HashMap;
+import java.util.*;
 
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.*;
-import android.media.SoundPool;
+import android.media.*;
 import android.view.*;
 
 import com.example.untouchable.R;
@@ -19,15 +19,18 @@ public class Player extends GameObject {
 	private static int frame = 0, width, height;
 	private int xSpeed = 0, ySpeed = 0;
 	private Rect src, dst;
-	private boolean win = false, beginFire = true, emp = false, explode = false;
-	private int beamWidth = 1, empR = 0;
+	private boolean fireBeam, expandBeam = true, emp = false, explode;
+	private int beamWidth = 1, empR = 0, streamId = 0;
 	private RectF empBox, playerBox;
 	private static Bitmap exhaust;
 	private static Paint paint;
+	private static AudioTrack beamSound;
 	
 	/**
 	 * Class constructor.
-	 * @param context the parent context for the Player
+	 * @param context the execution context
+	 * @param sounds the sound effects
+	 * @param soundLbls the sound effect IDs
 	 */
 	public Player(Context context, SoundPool sounds, HashMap<String, Integer> soundLbls) {
 		super(context, sounds, soundLbls);
@@ -43,22 +46,42 @@ public class Player extends GameObject {
 		empBox = new RectF(0, 0, 0, 0);
 		playerBox = new RectF(0, 0, 0, 0);
 		
+        beamSound = new AudioTrack(
+                AudioManager.STREAM_MUSIC, 
+                22050, 
+                AudioFormat.CHANNEL_OUT_DEFAULT, 
+                AudioFormat.ENCODING_DEFAULT, 
+                17000, 
+                AudioTrack.MODE_STATIC
+        );
+        
+        //TODO: load "beamfire", convert to PCM
+        
+        //beamSound.write(pcmData, 0, pcmData.length);
+
 		init();
 	}
 
 	/**
-	 * Initializes the Player position.
+	 * Initializes the Player fields.
 	 */
 	public void init() {
 		View fg = ((Activity)context).findViewById(R.id.fg);
 		x = fg.getWidth() / 2;
 		y = fg.getHeight() - height/2;
 		
+		xSpeed = ySpeed = 0;
+		
 		playerBox.set(x - (int)(6f/57*width), y - (int)(10f*height/141), 
 				x + (int)(6f*width/57), y + (int)(10f*height/141));
 		
 		src = new Rect(0, 0, width, height);
 		dst = new Rect(x - width/2, y - (int)(height/2.6f), x + width/2, y + (int)(height*(16f/26f)));
+		
+		fireBeam = false;
+		explode = false;
+		emp = false;
+		expandBeam = true;
 	}
 	
 	/**
@@ -68,9 +91,9 @@ public class Player extends GameObject {
 	 * @param move whether or not the Player can move
 	 */
 	public void update (int canvasWidth, int canvasHeight, boolean move) {
-		frame = ++frame % 4;
+		frame = ++frame % 2;
 
-		int srcX = (frame/2) * width;
+		int srcX = frame * width;
 
 		if(move) {
 			if(x < width/2) {
@@ -103,8 +126,12 @@ public class Player extends GameObject {
 		
 	}
 
+	/**
+	 * Draws the Player.
+	 * @param canvas the drawing surface
+	 */
 	public void draw(Canvas canvas) {
-		if(win) {
+		if(fireBeam) {
 			drawBeam(canvas);
 		}
 		
@@ -116,7 +143,7 @@ public class Player extends GameObject {
 		}
 		
 		else {
-			//TODO: draw explosion
+			updateAndDrawExplosion(canvas);
 		}
 
 		if(emp) {
@@ -126,6 +153,10 @@ public class Player extends GameObject {
 		//drawDebugHitbox(canvas);	
 	}
 	
+	/**
+	 * Draws the beam.
+	 * @param canvas the drawing surface
+	 */
 	private void drawBeam(Canvas canvas) {
 		Point center = getCenter();
 		
@@ -142,11 +173,13 @@ public class Player extends GameObject {
 		paint.setColor(Color.WHITE);
 		canvas.drawRect(center.x - tempWidth/3, 0, center.x + tempWidth/3, center.y - height/20, paint);
 		
-		if(beginFire) {
+		//sounds.resume(streamId);
+		
+		if(expandBeam) {
 			beamWidth++;
 			
 			if(beamWidth > 100) {
-				beginFire = false;
+				expandBeam = false;
 			}
 		}
 		
@@ -154,17 +187,17 @@ public class Player extends GameObject {
 			beamWidth--;
 			
 			if(beamWidth < 1) {
-				win = false;
+				fireBeam = false;
 				
-				beginFire = true;
+				expandBeam = true;
 				
-				sounds.stop(soundLbls.get("beamfire"));
+				sounds.stop(streamId);
 			}
 		}
 	}
 	
 	/**
-	 * 
+	 * Sets the movement speed of the Player, based on the orientation of the device.
 	 * @param azimuth the angle of horizontal displacement, in radians 
 	 * @param altitude the angle of vertical displacement, in radians
 	 */
@@ -179,7 +212,7 @@ public class Player extends GameObject {
 
 	/**
 	 * Draws the debug hitbox.
-	 * @param canvas the canvas to draw on
+	 * @param canvas the drawing surface
 	 */
 	protected void drawDebugHitbox(Canvas canvas) {
 		//debug
@@ -198,16 +231,20 @@ public class Player extends GameObject {
 	public Point getCenter() {
 		return new Point(x, y);
 	}
-
-	/*
-	 * Returns the current hitbox of the Player.
-	 * @return a RectF that defines the bounds of the hitbox
-	 */		 
+	 
+	/**
+	 * Returns the current boundaries of the Player sprite.
+	 * @return a RectF that defines the bounds of the sprite
+	 */
 	@Override
 	public RectF getBounds() {
 		return new RectF(x - width/2f, y - height/2.6f, x + width/2f, y + height*(16f/26f));
 	}
 	
+	/**
+	 * Returns the current hitbox of the Player.
+	 * @return a RectF that defines the bounds of the hitbox
+	 */	
 	public RectF getHitbox() {
 		playerBox.set(x - 6f/57f*width, y - 8f*height/141f, 
 				x + 6f*width/57f, y + 8f*height/141f);
@@ -215,6 +252,10 @@ public class Player extends GameObject {
 		return playerBox;
 	}
 	
+	/**
+	 * Updates the location and width of the EMP and draws it.
+	 * @param canvas the drawing surface
+	 */
 	private void updateAndDrawEMP(Canvas canvas) {
 		Point center = getCenter();
 		
@@ -234,31 +275,52 @@ public class Player extends GameObject {
 		}
 	}
 	
+	/**
+	 * Returns the current radius of the EMP wave.
+	 * @return one half of the length of the EMP boundary box
+	 */
 	public int getEMPR() {
 		return empR;
 	}
 	
-	public void setWinState(boolean state) {
-		win = state;
+	/**
+	 * Sets whether or not the beam should be firing.
+	 * @param state the state of the beam
+	 */
+	public void setBeamState(boolean state) {
+		fireBeam = state;
 		
-		if(win) {
-			sounds.play(soundLbls.get("beamfire"), .5f, .5f, 1, -1, .5f);
-		}
+		/*if(fireBeam) {
+			streamId = sounds.play(soundLbls.get("beamfire"), .5f, .5f, 1, -1, .5f);
+		}*/
+		
+	//	beamSound.play();
 	}
 	
-	public Bitmap getSprite() {
-		return sprite;
-	}
-	
-	public void activateEMP() {
-		emp = true;
-		
-		sounds.play(soundLbls.get("emp"), .25f, .25f, 1, 0, 1);
+	/**
+	 * Activates the EMP animation.
+	 */
+	public void startEMP() {
+    	emp = true;
+    		
+		sounds.play(soundLbls.get("emp"), .125f, .125f, 1, 0, 2.f);
 	}
 
+	/**
+	 * Activates the explosion animation.
+	 */
 	public void startExplosion() {
 		explode = true;
 		
-		sounds.play(soundLbls.get("explosion_short"), .5f, .5f, 1, 0, 1);
+		sounds.play(soundLbls.get("explosion_short"), .125f, .125f, 1, 0, 1);
 	}
+	
+	/**
+	 * 
+	 * @param canvas the drawing surface
+	 */
+	private void updateAndDrawExplosion(Canvas canvas) {
+		
+	}
+
 }

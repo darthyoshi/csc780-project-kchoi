@@ -5,6 +5,8 @@
 
 package com.example.untouchable.fragments;
 
+import java.util.HashMap;
+
 import com.example.untouchable.*;
 import com.example.untouchable.canvas.ForegroundView;
 
@@ -12,17 +14,20 @@ import android.app.*;
 import android.content.*;
 import android.content.res.TypedArray;
 import android.hardware.*;
+import android.media.*;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.*;
-import android.widget.*;
 
 public class GameFragment extends Fragment implements SensorEventListener {
 	private float xInit, yInit;
 	private float dX, dY, dZ;
-	private boolean init = false;
+	private boolean init = false, useSensor;
 	private short difficulty, azimuth, altitude;
 	private int score = 0, level;
 	private ForegroundView fg;
+	private static SoundPool sounds = null;
+	private static HashMap<String, Integer> soundLbls = null;
 	private static SensorManager sensorManager;
 	
 /*	//for debug
@@ -50,17 +55,33 @@ public class GameFragment extends Fragment implements SensorEventListener {
 		init = false;
 		
 		Activity parent = getActivity();
+
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(parent);
+		useSensor = prefs.getBoolean("useSensor", true);
+
+		switch(prefs.getString("difficulty", "Normal")) {
+		case "Easy":
+		    difficulty = 1;
+		    
+		    break;
+		
+		case "Normal":
+		    difficulty = 2;
+		
+		    break;
+		
+		case "Hard":
+		    difficulty = 3;
+		}
 		
 		TypedArray enemyIds = parent.getResources().obtainTypedArray(R.array.enemy_sprites);
 		
 		int[] enemySpriteIds = new int[enemyIds.length()];
-		for(short i = 0; i < enemyIds.length(); i++) {
+		for(short i = 0; i < enemySpriteIds.length; i++) {
 			enemySpriteIds[i] = enemyIds.getResourceId(i, 0);
 		}
 		
 		enemyIds.recycle();
-		
-		fg = (ForegroundView)parent.findViewById(R.id.fg);
 /*
 		{	//for debug
 			lblX = (TextView)parent.findViewById(R.id.lblX);
@@ -78,19 +99,42 @@ public class GameFragment extends Fragment implements SensorEventListener {
 			lblAz2 = (TextView)parent.findViewById(R.id.initAz);
 		}
 */
-        /*
-         * Retrieve the SensorManager.
-         */
-        sensorManager = (SensorManager) parent.getSystemService(Context.SENSOR_SERVICE);
-        /*
-         * Register this activity as the listener for accelerometer events.
-         */
-        sensorManager.registerListener(
-        		this,
-        		sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
-        		SensorManager.SENSOR_DELAY_NORMAL);
+		if(useSensor) {
+            /*
+             * Retrieve the SensorManager.
+             */
+            sensorManager = (SensorManager) parent.getSystemService(Context.SENSOR_SERVICE);
+            /*
+             * Register this activity as the listener for accelerometer events.
+             */
+            sensorManager.registerListener(
+            		this,
+            		sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
+            		SensorManager.SENSOR_DELAY_NORMAL);
+    	}
+		
+        if(sounds == null) {
+			sounds = new SoundPool(50, AudioManager.STREAM_MUSIC, 0);
+        }
         
-        fg.initParams(difficulty, level, score, enemySpriteIds);
+        if(soundLbls == null) {
+			TypedArray soundIds = getResources().obtainTypedArray(R.array.sound_ids);
+			
+			soundLbls = new HashMap<String, Integer>();
+			
+			String[] tmp;
+			
+			for(short i = 0; i < soundIds.length(); i++) {
+				tmp = getResources().getResourceName(soundIds.getResourceId(i, 0)).split("/");
+				
+				soundLbls.put(tmp[1], sounds.load(parent, soundIds.getResourceId(i, 0), 1));
+			}
+			
+			soundIds.recycle();
+        }
+
+		fg = (ForegroundView)parent.findViewById(R.id.fg);
+        fg.initParams(difficulty, level, score, enemySpriteIds, sounds, soundLbls, useSensor);
 	}
 	
 	@Override
@@ -150,8 +194,10 @@ public class GameFragment extends Fragment implements SensorEventListener {
 	@Override
 	public void onPause() {
 		super.onPause();
-		sensorManager.unregisterListener(this);
-		fg.pause();
+		if(useSensor) {
+		    sensorManager.unregisterListener(this);
+		}
+		fg.pauseThread();
 	}
 
 	/**
@@ -161,6 +207,10 @@ public class GameFragment extends Fragment implements SensorEventListener {
 		return difficulty;
 	}
 
+	
+	public void onDestroy() {
+		super.onDestroy();
+	}
 
 	/**
 	 * @param difficulty the difficulty to set
@@ -172,7 +222,7 @@ public class GameFragment extends Fragment implements SensorEventListener {
 	public void onBackPressed() {
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 		
-		fg.pause();
+		fg.pauseThread();
 		
 		builder.setMessage("Do you really wish to quit?\n\nYour score will be lost!")
 			.setNegativeButton("Resume", new DialogInterface.OnClickListener() {
@@ -181,7 +231,7 @@ public class GameFragment extends Fragment implements SensorEventListener {
 				public void onClick(DialogInterface dialog, int which) {
 					init = false;
 					
-					fg.resume();
+					fg.resumeThread();
 		
 					dialog.dismiss();
 				}
@@ -218,6 +268,10 @@ public class GameFragment extends Fragment implements SensorEventListener {
 		this.score = score;
 	}
 
+	/**
+	 * Specifies whether or not to reinitialize the accelerometer values.
+	 * @param state the new accelerometer initialization state
+	 */
 	public void setInitState(boolean state) {
 		init = state;
 	}

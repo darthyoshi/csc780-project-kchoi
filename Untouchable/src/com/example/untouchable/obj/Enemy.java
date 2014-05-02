@@ -26,9 +26,11 @@ public class Enemy extends GameObject {
 	private boolean explode = false;
 	
 	/**
-	 * 
-	 * @param context the parent Context for the Enemy
-	 * @param type
+	 * Class constructor.
+	 * @param type specifies which Enemy to initialize
+	 * @param context the execution context
+	 * @param sounds the sound effects
+	 * @param soundLbls the sound effect IDs
 	 */
 	public Enemy(int type, Context context, SoundPool sounds, HashMap<String, Integer> soundLbls) {
 		super(context, sounds, soundLbls);
@@ -41,6 +43,10 @@ public class Enemy extends GameObject {
 		init(type);
 	}
 	
+	/**
+	 * Initializes the Enemy. The proper sprite is chosen, and the Guns are generated in the appropriate patterns.
+	 * @param type specifies which Enemy to initialize
+	 */
 	public void init(int type) {
 		TypedArray tmpArray = context.getResources().obtainTypedArray(R.array.enemy_sprites);
 		int spriteIds = tmpArray.getResourceId(type, -1);
@@ -77,8 +83,8 @@ public class Enemy extends GameObject {
 		switch(type) {
 		case 0:
 			for(i = 1; i < 3; i++) {
-				guns.add(new Gun(x + width/2 + i*width/6, y + (1+i)*height/6, /*(int)(Math.random()*5)*/(i-1)*2, context, sounds, soundLbls));
-				guns.add(new Gun(x + width/2 - i*width/6, y + (1+i)*height/6, /*(int)(Math.random()*5)*/2*i-1, context, sounds, soundLbls));
+				guns.add(new Gun(x + width/2 + i*width/6, y + (1+i)*height/6, (i-1)*2, context, sounds, soundLbls));
+				guns.add(new Gun(x + width/2 - i*width/6, y + (1+i)*height/6, 2*i-1, context, sounds, soundLbls));
 			}
 			
 			break;
@@ -157,18 +163,26 @@ public class Enemy extends GameObject {
 	 * @param canvasHeight the height of the canvas
 	 */
 	public void update(int canvasHeight) {
-		frame = ++frame % 4;
+		frame = ++frame % 2;
 
-		int srcX = width - (frame/2) * width;
+		int srcX = width - frame * width;
 		
 		if(y > 0) {
 			y -= canvasHeight/40;
 			
 			for(Gun gun : guns) {
 				gun.setY(gun.getY() - canvasHeight/40);
+				
+				if(y < 0) {
+				    gun.setY(gun.getY() - y);
+				}
+			}
+			
+			if(y < 0) {
+			    y = 0;
 			}
 		}
-				System.out.println(y);
+
 		src = new Rect(srcX, 0, srcX + width, height);
 		dst = new Rect(x, y, x + width, y + height);
 	}
@@ -176,6 +190,10 @@ public class Enemy extends GameObject {
 	public void draw(Canvas canvas) {
 		canvas.drawBitmap(exhaust, src, dst, exhaustAlpha);
 		canvas.drawBitmap(sprite, dst.left, dst.top, null);
+		
+		if(explode) {
+			
+		}
 	}
 
 	public void startExplosion() {
