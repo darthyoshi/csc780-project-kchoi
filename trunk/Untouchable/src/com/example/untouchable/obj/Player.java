@@ -22,9 +22,9 @@ public class Player extends GameObject {
 	private boolean fireBeam, expandBeam = true, emp = false, explode;
 	private int beamWidth = 1, empR = 0, streamId = 0;
 	private RectF empBox, playerBox;
-	private static Bitmap exhaust;
-	private static Paint paint;
-	private static AudioTrack beamSound;
+	private static Bitmap exhaust = null, explosion = null;
+	private static Paint paint = null;
+	private static AudioTrack beamSound = null;
 	
 	/**
 	 * Class constructor.
@@ -35,13 +35,22 @@ public class Player extends GameObject {
 	public Player(Context context, SoundPool sounds, HashMap<String, Integer> soundLbls) {
 		super(context, sounds, soundLbls);
 		
-		exhaust = BitmapFactory.decodeResource(context.getResources(), R.drawable.sprite_player_exhaust);
 		sprite = BitmapFactory.decodeResource(context.getResources(), R.drawable.sprite_player_ship);
+		
+		if(exhaust == null) {
+    		exhaust = BitmapFactory.decodeResource(context.getResources(), R.drawable.sprite_player_exhaust);
+		}
+		
+		if(explosion == null) {
+    		explosion = BitmapFactory.decodeResource(context.getResources(), R.drawable.sprite_explosion_1);
+		}
 		
 		height = sprite.getHeight();
 		width = sprite.getWidth();
 		
-		paint = new Paint();
+		if(paint == null) {
+		    paint = new Paint();
+		}
 		
 		empBox = new RectF(0, 0, 0, 0);
 		playerBox = new RectF(0, 0, 0, 0);
@@ -176,7 +185,7 @@ public class Player extends GameObject {
 		//sounds.resume(streamId);
 		
 		if(expandBeam) {
-			beamWidth++;
+			beamWidth += 2;
 			
 			if(beamWidth > 100) {
 				expandBeam = false;
@@ -184,14 +193,12 @@ public class Player extends GameObject {
 		}
 		
 		else {
-			beamWidth--;
+			beamWidth -= 2;
 			
 			if(beamWidth < 1) {
 				fireBeam = false;
 				
-				expandBeam = true;
-				
-				sounds.stop(streamId);
+	//			sounds.stop(streamId);
 			}
 		}
 	}
@@ -320,7 +327,13 @@ public class Player extends GameObject {
 	 * @param canvas the drawing surface
 	 */
 	private void updateAndDrawExplosion(Canvas canvas) {
-		
+		if(frame % 2 == 0) {
+		    canvas.drawBitmap(explosion, x-explosion.getWidth()/2, y-explosion.getHeight()/2, null);
+		}
 	}
 
+	public boolean beamFinished() {
+	    return !(fireBeam && expandBeam);
+	}
+	
 }

@@ -15,7 +15,6 @@ import android.media.SoundPool;
 
 import com.example.untouchable.R;
 
-//TODO create Enemy fields and methods
 public class Enemy extends GameObject {
 	private ArrayList<Gun> guns;
 	private int type;
@@ -23,7 +22,9 @@ public class Enemy extends GameObject {
 	private static int height, width, frame = 0;
 	private static Rect src, dst;
 	private static Paint exhaustAlpha;
+	private static Bitmap explosion = null;
 	private boolean explode = false;
+	private ArrayList<Point> explosions = null;
 	
 	/**
 	 * Class constructor.
@@ -72,9 +73,24 @@ public class Enemy extends GameObject {
 		x = (outSize.x - width)/2;
 		y = outSize.y;
 		
+		if(explosion == null) {
+		    explosion = BitmapFactory.decodeResource(context.getResources(), R.drawable.sprite_explosion_2);
+		}
+		
+		if(explosions == null) {
+		    explosions = new ArrayList<Point>();
+		}
+		
+		else {
+		    explosions.clear();
+		}
+		
 		genGuns();
 	}
 	
+	/**
+	 * Determines the Gun layout for the Enemy and generates the Gun objects.
+	 */
 	private void genGuns() {
 		guns = new ArrayList<Gun>();
 		
@@ -129,23 +145,18 @@ public class Enemy extends GameObject {
 		}
 	}
 	
-	public void init() {
-		int dy = ((Activity) context).findViewById(R.id.fg).getHeight() - y;
-		
-		y += dy;
-		
-		for(Gun gun : guns) {
-			gun.setY(gun.getY()+dy);
-		}
-	}
-	
 	/**
-	 * @return the guns
+	 * Retrieves the Guns associated with the Enemy.
+	 * @return an ArrayList containing the Guns
 	 */
 	public ArrayList<Gun> getGuns() {
 		return guns;
 	}
 	
+	/**
+	 * Fires each of the Guns of the Enemy and returns the new Shots.
+	 * @return an ArrayList containing the newly fired Shots
+	 */
 	public ArrayList<Shot> fireGuns() {
 		ArrayList<Shot> result = new ArrayList<Shot>();
 		
@@ -154,7 +165,7 @@ public class Enemy extends GameObject {
 				result.addAll(gun.fireGun());
 			}
 		}
-		
+
 		return result;
 	}
 	
@@ -164,11 +175,11 @@ public class Enemy extends GameObject {
 	 */
 	public void update(int canvasHeight) {
 		frame = ++frame % 2;
-
+    		
 		int srcX = width - frame * width;
 		
 		if(y > 0) {
-			y -= canvasHeight/40;
+    		y -= canvasHeight/40;
 			
 			for(Gun gun : guns) {
 				gun.setY(gun.getY() - canvasHeight/40);
@@ -192,11 +203,27 @@ public class Enemy extends GameObject {
 		canvas.drawBitmap(sprite, dst.left, dst.top, null);
 		
 		if(explode) {
-			
+			drawExplosion(canvas);
 		}
+	}
+	
+	private void drawExplosion(Canvas canvas) {
+	    if(frame % 2 == 0) {
+	        for(Point point : explosions) {
+	            canvas.drawBitmap(explosion, point.x, point.y, null);
+	        }
+	    }
 	}
 
 	public void startExplosion() {
 		explode = true;
+		
+        sounds.play(soundLbls.get("explosion_long"), .125f, .125f, 1, 0, 1);
+        
+        for(short i = 0; i < 10; i++) {
+            explosions.add(new Point((int)(Math.random()*sprite.getWidth()/2), (int)(Math.random()*sprite.getHeight()/2)));
+        }
+        
+        guns.clear();
 	}
 }

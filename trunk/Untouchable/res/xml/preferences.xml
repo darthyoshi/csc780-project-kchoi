@@ -2,16 +2,28 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
     <CheckBoxPreference 
         android:summaryOn="Tilt the device to control the ship. Pausing will reset the rest position." 
-        android:summaryOff="Touch the screen to drag the ship.\n" 
+        android:summaryOff="To control the ship, slide your finger along the screen." 
         android:persistent="true"
         android:key="useSensor" 
-        android:title="Control Type"/>
+        android:title="Tilt Controls"/>
+
     <ListPreference
         android:persistent="true"
         android:entries="@array/difficulties"
         android:entryValues="@array/difficulties" 
         android:key="difficulty" 
         android:title="Set Difficulty"
-        android:defaultValue="@string/normal"/>
+        android:defaultValue="@string/normal" android:summary="%s"/>
+    
+    
+    <Preference android:summary="Warning: this cannot be undone." android:key="resetScores" android:title="Reset Scores"/><PreferenceCategory android:title="@string/debug">
+        <CheckBoxPreference
+            android:summaryOn="The player ship is invincble." 
+            android:summaryOff="The player ship is not invincible." 
+            android:persistent="true" 
+            android:key="godMode" 
+            android:title="God Mode" />
+    </PreferenceCategory>
+    
 
 </PreferenceScreen>

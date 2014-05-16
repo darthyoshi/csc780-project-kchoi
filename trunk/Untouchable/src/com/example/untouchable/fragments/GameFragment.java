@@ -22,7 +22,7 @@ import android.view.*;
 public class GameFragment extends Fragment implements SensorEventListener {
 	private float xInit, yInit;
 	private float dX, dY, dZ;
-	private boolean init = false, useSensor;
+	private boolean initSensor = false, useSensor, initGame, godMode;
 	private short difficulty, azimuth, altitude;
 	private int score = 0, level;
 	private ForegroundView fg;
@@ -52,7 +52,7 @@ public class GameFragment extends Fragment implements SensorEventListener {
 	 * Initializes the game.
 	 */
 	private void init() {
-		init = false;
+		initSensor = false;
 		
 		Activity parent = getActivity();
 
@@ -73,6 +73,8 @@ public class GameFragment extends Fragment implements SensorEventListener {
 		case "Hard":
 		    difficulty = 3;
 		}
+		
+		godMode = prefs.getBoolean("godMode", false);
 		
 		TypedArray enemyIds = parent.getResources().obtainTypedArray(R.array.enemy_sprites);
 		
@@ -114,7 +116,7 @@ public class GameFragment extends Fragment implements SensorEventListener {
     	}
 		
         if(sounds == null) {
-			sounds = new SoundPool(50, AudioManager.STREAM_MUSIC, 0);
+			sounds = new SoundPool(25, AudioManager.STREAM_MUSIC, 0);
         }
         
         if(soundLbls == null) {
@@ -134,7 +136,7 @@ public class GameFragment extends Fragment implements SensorEventListener {
         }
 
 		fg = (ForegroundView)parent.findViewById(R.id.fg);
-        fg.initParams(difficulty, level, score, enemySpriteIds, sounds, soundLbls, useSensor);
+        fg.initParams(difficulty, level, score, enemySpriteIds, sounds, soundLbls, useSensor, godMode);
 	}
 	
 	@Override
@@ -148,8 +150,8 @@ public class GameFragment extends Fragment implements SensorEventListener {
 
 	@Override
 	public void onSensorChanged(SensorEvent event) {
-		if(!init) {
-			init = true;
+		if(!initSensor) {
+			initSensor = true;
 		
 			xInit = event.values[0];
 			yInit = event.values[1];
@@ -186,7 +188,9 @@ public class GameFragment extends Fragment implements SensorEventListener {
 				lblAl.setText(Integer.toString(altitude));
 			}
 */
-			fg.getPlayer().setSpeed(Math.toRadians(azimuth), Math.toRadians(altitude));
+			synchronized(fg.getPlayer()) {
+			    fg.getPlayer().setSpeed(Math.toRadians(azimuth), Math.toRadians(altitude));
+			}
 		}
 
 	}
@@ -194,20 +198,14 @@ public class GameFragment extends Fragment implements SensorEventListener {
 	@Override
 	public void onPause() {
 		super.onPause();
+		
 		if(useSensor) {
 		    sensorManager.unregisterListener(this);
 		}
+		
 		fg.pauseThread();
 	}
 
-	/**
-	 * @return the difficulty
-	 */
-	public short getDifficulty() {
-		return difficulty;
-	}
-
-	
 	public void onDestroy() {
 		super.onDestroy();
 	}
@@ -224,26 +222,26 @@ public class GameFragment extends Fragment implements SensorEventListener {
 		
 		fg.pauseThread();
 		
+		initSensor = false;
+		
 		builder.setMessage("Do you really wish to quit?\n\nYour score will be lost!")
-			.setNegativeButton("Resume", new DialogInterface.OnClickListener() {
+			.setNegativeButton(getActivity().getResources().getString(R.string.resume), new DialogInterface.OnClickListener() {
 			
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
-					init = false;
-					
 					fg.resumeThread();
 		
 					dialog.dismiss();
 				}
 			})
-			.setTitle("Quit")
-			.setPositiveButton("Quit", new DialogInterface.OnClickListener() {
+			.setTitle(getActivity().getResources().getString(R.string.quit))
+			.setPositiveButton(getActivity().getResources().getString(R.string.quit), new DialogInterface.OnClickListener() {
 				
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					fg.setInit(true);
 					
-					getActivity().getFragmentManager().popBackStackImmediate();
+					getFragmentManager().popBackStackImmediate();
 				}
 			})
 			.setCancelable(false);
@@ -262,10 +260,23 @@ public class GameFragment extends Fragment implements SensorEventListener {
 
 
 	/**
-	 * @param score the score to set
+	 * Increments the score for the current game session.
+	 * @param baseScore the score to add
 	 */
-	public void setScore(int score) {
-		this.score = score;
+	public void updateScore(int baseScore, int timeScore, int lvlScore) {
+		score += lvlScore;
+		
+  		String tag = "RESULT_FRAGMENT";
+	    Fragment frag = new ResultFragment();
+
+	    ((ResultFragment)frag).setParams(baseScore, timeScore, difficulty, lvlScore, score);
+	    
+	    getFragmentManager()
+	        .beginTransaction()
+	        .replace(R.id.main_frame, frag, tag)
+	        .addToBackStack(tag)
+	        .show(frag)
+	        .commit();
 	}
 
 	/**
@@ -273,6 +284,21 @@ public class GameFragment extends Fragment implements SensorEventListener {
 	 * @param state the new accelerometer initialization state
 	 */
 	public void setInitState(boolean state) {
-		init = state;
+		initSensor = state;
 	}
+
+    public void saveScore() {
+        String tag = "SCORE_FRAGMENT";
+        Fragment frag = new HiScoreFragment();
+
+        ((HiScoreFragment)frag).setScore(score);
+        
+        getFragmentManager()
+            .beginTransaction()
+            .replace(R.id.main_frame, frag, tag)
+            .addToBackStack(tag)
+            .show(frag)
+            .commit();
+        
+    }
 }
