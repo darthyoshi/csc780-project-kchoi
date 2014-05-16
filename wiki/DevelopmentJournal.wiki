@@ -57,3 +57,12 @@
   * Sound IDs retrieved when `GameFragment` loads, rather than when initializing `ForegroundView`.
   * Added init() methods to `Enemy`, `Player`, `Gun` classes.
   * Doubled `Player` and `Enemy` exhaust framerates.
+
+14 May 2014
+  * Fixed bug where `Gun` firing pattern 1 intermittently fired with no cooldown.
+  * Getting a game over brings up `HiScoreFragment`. TODO:  adjust delay between game over and `HiScoreFragment`.
+  * Implemented a `ScoreManager` to handle file IO.
+  * Clearing a level brings up `ResultFragment`. TODO: adjust delay between level clear and `ResultFragment`.
+  * Session scores now persist between levels.
+  * Added explosion sprites.
+  * Implemented `PreferencesFragment` to select difficulty, control style, and score resetting.
