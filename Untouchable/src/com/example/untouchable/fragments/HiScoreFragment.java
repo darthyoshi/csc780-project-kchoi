@@ -5,12 +5,11 @@
 
 package com.example.untouchable.fragments;
 
-import java.io.*;
 import java.util.*;
-import java.util.Map.Entry;
 
 import android.app.*;
-import android.content.Context;
+import android.content.DialogInterface;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.view.*;
 import android.widget.*;
@@ -18,86 +17,30 @@ import android.widget.*;
 import com.example.untouchable.R;
 
 public class HiScoreFragment extends Fragment {
-    private TreeMap<Integer, String> scoreList = null;
+    private ArrayList<Integer> scores = null;
+    private ArrayList<String> names = null;
+    private int score = -1;
+    private EditText input = null;
     
     @Override
     public void onResume() {
     	super.onResume();
     	
-    	if(scoreList == null) {
-	    	scoreList = new TreeMap<Integer, String>();
-
-	    	BufferedReader reader = null;
-	    	try {
-	    		reader = new BufferedReader(new InputStreamReader(getActivity().openFileInput("myscores.txt")));
-    		}
-	    	
-	    	catch(Exception e) {
-		    	try {
-		    		reader = new BufferedReader(new InputStreamReader(getActivity().getAssets().open("scores.txt")));
-		    	}
-		    	
-	    		catch(Exception e1) {
-	    			e1.printStackTrace();
-	    		}
-	    	}
-	    	
-	    	finally {
-	    		if(reader != null) {
-	    			try {
-			    		String line;
-				    	String[] words;
-			    		while((line = reader.readLine()) != null) {
-			    			words = line.split(",");
-			    			
-							scoreList.put(Integer.parseInt(words[0]), words[1]);
-						}
-		
-			    		reader.close();
-					}
-	    			
-	    			catch (IOException e) {
-						e.printStackTrace();
-					}
-	    		}
-	    	}
-    	}
-
-		TableLayout table = (TableLayout)(getActivity().findViewById(R.id.score_list));
-		
-		TableRow row;
-		TextView num, score, name;
-    	Iterator<Integer> iter = scoreList.descendingKeySet().iterator();
     	Activity parent = getActivity();
     	
-    	for(int i = 1; i <= scoreList.size(); i++) {
-    		int key = iter.next();
-    		
-    		row = new TableRow(parent);
-    		row.setLayoutMode(TableLayout.LayoutParams.MATCH_PARENT);
-    		
-    		num = new TextView(parent);
-    		num.setText(Integer.toString(i) + '.');
-    		num.setTextColor(getResources().getColor(R.color.white));
-    		num.setPadding(0, 0, 15, 0);
-    		num.setTextSize(17);
-    	
-    		score = new TextView(parent);
-    		score.setText(Integer.toString(key));
-    		score.setTextColor(getResources().getColor(R.color.white));
-    		score.setTextSize(17);
-    		
-    		name = new TextView(parent);
-    		name.setText(scoreList.get(key));
-    		name.setTextColor(getResources().getColor(R.color.white));
-    		name.setTextSize(17);
-    		
-    		row.addView(num);
-    		row.addView(score);
-    		row.addView(name);
-    		
-    		table.addView(row);
+    	if(scores == null) {
+	    	scores = ScoreManager.readScores(parent);
     	}
+    	
+    	if(names == null) {
+    	    names = ScoreManager.readNames(parent);
+    	}
+    	
+    	if(score >= scores.get(scores.size()-1)) {
+    	    saveEntry(parent);
+    	}
+    	
+    	populateTable(parent);
     }
     
 	/**
@@ -118,25 +61,135 @@ public class HiScoreFragment extends Fragment {
 	public void onPause() {
 		super.onPause();
 		
-		if(scoreList != null) {
-			try {
-				BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(getActivity().openFileOutput("myscores.txt", Context.MODE_PRIVATE)));
-				
-				Iterator<Entry<Integer, String>> iter = scoreList.entrySet().iterator();
-				Entry<Integer, String> entry;
-				while(iter.hasNext()) {
-					entry = iter.next();
-					
-					writer.write(entry.getKey().toString() + ',' + entry.getValue() + '\n');
-				}
-				
-				writer.close();
-			}
-			
-			catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+		if(scores != null && names != null) {
+	        ScoreManager.saveScores(scores, names, getActivity());
 		}
 	}
+	
+    public void setScore(int score) {
+        this.score = 2001/*score*/;
+    }
+    
+    private void populateTable(Activity parent) {
+        TableLayout table = (TableLayout)(parent.findViewById(R.id.score_list));
+        
+        TableRow row;
+        TextView num, score, name;
+        Resources resources = parent.getResources();
+        
+        short i;
+        
+        if(table.getChildCount() == 0) {
+            for(i = 1; i <= scores.size(); i++) {
+                row = new TableRow(parent);
+                row.setLayoutMode(TableLayout.LayoutParams.MATCH_PARENT);
+                
+                num = new TextView(parent);
+                num.setText(Integer.toString(i) + '.');
+                num.setTextColor(resources.getColor(R.color.white));
+                num.setPadding(0, 0, 15, 0);
+                num.setTextSize(17);
+            
+                score = new TextView(parent);
+                score.setText(Integer.toString(scores.get(i-1)));
+                score.setTextColor(resources.getColor(R.color.white));
+                score.setTextSize(17);
+                
+                name = new TextView(parent);
+                name.setText(names.get(i-1));
+                name.setTextColor(resources.getColor(R.color.white));
+                name.setTextSize(17);
+                
+                row.addView(num);
+                row.addView(score);
+                row.addView(name);
+                
+                table.addView(row);
+            }   
+        }
+        
+        else {
+            for(i = 0; i < scores.size(); i++) {
+                row = (TableRow) table.getChildAt(i);
+System.out.println("blah");
+                ((TextView)row.getChildAt(1)).setText(Integer.toString(scores.get(i)));
+                ((TextView)row.getChildAt(2)).setText(names.get(i));
+            }
+        }
+    }
+    
+    private void saveEntry(Activity parent) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        
+        if(input == null) {
+            input = new EditText(parent);
+        }
+        
+        builder.setMessage("Congratulations, you have a high score!")
+            .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    short i = addScoreToList();
+                    
+                    names.add(i, "Faceless Monkey");
+                    
+                    names.remove(names.size() - 1);
+                    
+                    updateTable(getActivity());
+                    
+                    dialog.dismiss();
+                }
+            })
+            .setTitle("High Score")
+            .setPositiveButton(parent.getResources().getString(R.string.confirm), new DialogInterface.OnClickListener() {
+                
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    short i = addScoreToList();
+                    
+                    names.add(i, input.getText().toString());
+                    
+                    names.remove(names.size() - 1);
+                    
+                    updateTable(getActivity());
+                    
+                    dialog.dismiss();
+                }
+            })
+            .setView(input);
+    
+        AlertDialog dialog = builder.create();
+        dialog.show();        
+    }
+    
+    private short addScoreToList() {
+        short i;
+        for(i = 0; i < scores.size() && scores.get(i) > score; i++);
+        
+        scores.add(i, score);
+        
+        scores.remove(scores.size()-1);
+
+        return i;
+    }
+
+    /**
+     * Updates the score table.
+     * @param parent the parent Activity
+     */
+    private void updateTable(Activity parent) {
+        TableLayout table = (TableLayout)(parent.findViewById(R.id.score_list));
+        
+        TableRow row;
+        
+        short i;
+   
+        for(i = 0; i < scores.size(); i++) {
+            row = (TableRow) table.getChildAt(i);
+
+            ((TextView)row.getChildAt(1)).setText(Integer.toString(scores.get(i)));
+            ((TextView)row.getChildAt(2)).setText(names.get(i));
+        }
+    }
 }

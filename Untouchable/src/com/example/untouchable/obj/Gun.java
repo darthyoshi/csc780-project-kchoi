@@ -17,7 +17,7 @@ public class Gun extends GameObject {
 	private boolean init;
 	
 	//for debug
-	private Paint paint;
+//	private Paint paint;
 	
 	/**
 	 * Class constructor.
@@ -57,13 +57,12 @@ public class Gun extends GameObject {
 	public void draw(Canvas canvas) {
 		canvas.drawBitmap(sprite, matrix, null);
 		
-		paint = new Paint();
-		paint.setColor(Color.WHITE);
-		
-		canvas.drawText(""+pattern, x, y, paint);
 		/*
 		{ 	//for debug
-			paint = new Paint();
+        	paint = new Paint();
+        	paint.setColor(Color.WHITE);
+		    canvas.drawText(""+pattern, x, y, paint);
+		
 			paint.setColor(Color.RED);
 			canvas.drawCircle(x, y, 2, paint);
 		}*/
@@ -85,7 +84,10 @@ public class Gun extends GameObject {
 		case 1:
 			result.add(new Shot(x, y, bearing + Math.toRadians(5), 5+difficulty*5, context, sounds, soundLbls));
 			result.add(new Shot(x, y, bearing - Math.toRadians(5), 5+difficulty*5, context, sounds, soundLbls));
-		
+            result.add(new Shot(x, y, bearing, 5+difficulty*5, context, sounds, soundLbls));
+            
+            break;
+            
 		case 0:
 	        result.add(new Shot(x, y, bearing, 5+difficulty*5, context, sounds, soundLbls));
 	        

@@ -46,8 +46,7 @@ public class MainActivity extends Activity {
     public void onClick(View v) {
     	frag = getActiveFragment();
 
-		int viewId = v.getId();
-    	switch(viewId) {
+    	switch(v.getId()) {
     		case R.id.startButton:
     		case R.id.optionButton:
     		case R.id.scoresButton:
@@ -72,13 +71,20 @@ public class MainActivity extends Activity {
     
     @Override
     public void onBackPressed() {
+        FragmentManager fragMan = getFragmentManager();
     	frag = getActiveFragment();
     	
-    	if(frag.getTag().equals("GAME_FRAGMENT")) {
+    	String tag = frag.getTag();
+    	
+    	if(tag.equals("GAME_FRAGMENT")) {
     		((GameFragment)frag).onBackPressed();
     	}
     	
-    	else if(getFragmentManager().getBackStackEntryCount() > 1) {
+    	else if(tag.equals("SCORE_FRAGMENT") || tag.equals("RESULT_FRAGMENT")) {
+	        fragMan.popBackStack("TITLE_FRAGMENT", 0);
+    	}
+    	
+    	else if(fragMan.getBackStackEntryCount() > 1) {
     		super.onBackPressed();
     	}
     	

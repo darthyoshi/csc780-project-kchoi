@@ -8,14 +8,21 @@
     <string name="menu_scores">High Scores</string>
     <string name="instructions">Instructions go here. Instructions go here. Instructions go here. Instructions go here. Instructions go here. Instructions go here.</string>
     <string name="confirm">OK</string>
+    <string name="cancel">Cancel</string>
     <string name="done">Return to Main Menu</string>
     <string name="hard">Hard</string>
     <string name="normal">Normal</string>
     <string name="easy">Easy</string>
     <string name="difficulty">Select Difficulty</string>
     <string name="game_over">Game Over</string>
-    <string name="level">Level:</string>
+    <string name="level">Stage: </string>
     <string name="score">Score: </string>
+    <string name="lvlResult">Level Result</string>
+    <string name="tmp">n.a.</string>
+    <string name="cont">Continue</string>
+    <string name="quit">Quit</string>
+    <string name="resume">Resume</string>
+    <string name="debug">Debug</string>
     
     <string-array name="difficulties" >
         <item>@string/easy</item>

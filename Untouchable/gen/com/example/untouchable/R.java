@@ -48,33 +48,50 @@ public final class R {
         public static final int sprite_enemy_4_ship=0x7f020009;
         public static final int sprite_enemy_5_exhaust=0x7f02000a;
         public static final int sprite_enemy_5_ship=0x7f02000b;
-        public static final int sprite_gun=0x7f02000c;
-        public static final int sprite_player_exhaust=0x7f02000d;
-        public static final int sprite_player_ship=0x7f02000e;
-        public static final int sprite_shot=0x7f02000f;
+        public static final int sprite_explosion_1=0x7f02000c;
+        public static final int sprite_explosion_2=0x7f02000d;
+        public static final int sprite_gun=0x7f02000e;
+        public static final int sprite_player_exhaust=0x7f02000f;
+        public static final int sprite_player_ship=0x7f020010;
+        public static final int sprite_shot=0x7f020011;
     }
     public static final class id {
-        public static final int action_settings=0x7f0c000d;
+        public static final int action_settings=0x7f0c001b;
+        public static final int baseScore=0x7f0c0005;
         public static final int bg=0x7f0c0000;
-        public static final int easy=0x7f0c0007;
+        public static final int continueButton=0x7f0c000f;
+        public static final int easy=0x7f0c0015;
         public static final int fg=0x7f0c0002;
-        public static final int hard=0x7f0c0005;
+        public static final int hard=0x7f0c0013;
+        public static final int lvlScore=0x7f0c000b;
         public static final int main_frame=0x7f0c0001;
-        public static final int normal=0x7f0c0006;
-        public static final int optionButton=0x7f0c0009;
-        public static final int score_list=0x7f0c0004;
-        public static final int score_title=0x7f0c0003;
-        public static final int scoresButton=0x7f0c000b;
-        public static final int startButton=0x7f0c000a;
-        public static final int textView1=0x7f0c0008;
-        public static final int title=0x7f0c000c;
+        public static final int multiplier=0x7f0c0009;
+        public static final int normal=0x7f0c0014;
+        public static final int optionButton=0x7f0c0017;
+        public static final int quitButton=0x7f0c000e;
+        public static final int resultStatus=0x7f0c0010;
+        public static final int score_list=0x7f0c0012;
+        public static final int score_title=0x7f0c0011;
+        public static final int scoresButton=0x7f0c0019;
+        public static final int startButton=0x7f0c0018;
+        public static final int tableLayout1=0x7f0c0003;
+        public static final int tableRow1=0x7f0c0004;
+        public static final int tableRow2=0x7f0c0006;
+        public static final int tableRow3=0x7f0c0008;
+        public static final int tableRow4=0x7f0c000a;
+        public static final int tableRow5=0x7f0c000c;
+        public static final int textView1=0x7f0c0016;
+        public static final int timeScore=0x7f0c0007;
+        public static final int title=0x7f0c001a;
+        public static final int totalScore=0x7f0c000d;
     }
     public static final class layout {
         public static final int activity_main=0x7f030000;
         public static final int game=0x7f030001;
-        public static final int scores=0x7f030002;
-        public static final int start=0x7f030003;
-        public static final int title=0x7f030004;
+        public static final int result=0x7f030002;
+        public static final int scores=0x7f030003;
+        public static final int start=0x7f030004;
+        public static final int title=0x7f030005;
     }
     public static final class menu {
         public static final int main=0x7f0b0000;
@@ -89,19 +106,26 @@ public final class R {
     public static final class string {
         public static final int action_settings=0x7f090001;
         public static final int app_name=0x7f090000;
+        public static final int cancel=0x7f090007;
         public static final int confirm=0x7f090006;
-        public static final int difficulty=0x7f09000b;
-        public static final int done=0x7f090007;
-        public static final int easy=0x7f09000a;
-        public static final int game_over=0x7f09000c;
-        public static final int hard=0x7f090008;
+        public static final int cont=0x7f090012;
+        public static final int debug=0x7f090015;
+        public static final int difficulty=0x7f09000c;
+        public static final int done=0x7f090008;
+        public static final int easy=0x7f09000b;
+        public static final int game_over=0x7f09000d;
+        public static final int hard=0x7f090009;
         public static final int instructions=0x7f090005;
-        public static final int level=0x7f09000d;
+        public static final int level=0x7f09000e;
+        public static final int lvlResult=0x7f090010;
         public static final int menu_options=0x7f090003;
         public static final int menu_scores=0x7f090004;
         public static final int menu_start=0x7f090002;
-        public static final int normal=0x7f090009;
-        public static final int score=0x7f09000e;
+        public static final int normal=0x7f09000a;
+        public static final int quit=0x7f090013;
+        public static final int resume=0x7f090014;
+        public static final int score=0x7f09000f;
+        public static final int tmp=0x7f090011;
     }
     public static final class style {
         /** 

@@ -24,7 +24,7 @@ public class ForegroundView extends SurfaceView implements SurfaceHolder.Callbac
 	private short difficulty = 2, frame = 0;
 	private int level = -1, playTime = 0, score;
 	private long startTime;
-	private boolean init = true, isPaused = true, lvlClear = false, gameOver = false, useSensor;
+	private boolean init = true, isPaused = true, lvlClear = false, gameOver = false, useSensor, godMode;
 	private static Rect blank = null;
 	private static Paint erase = null;
 	private Iterator<Shot> iter;
@@ -35,10 +35,12 @@ public class ForegroundView extends SurfaceView implements SurfaceHolder.Callbac
 	private static Bitmap pauseButton;
 	private RectF playerHitbox, shotHitbox;
 	private Point playerCenter;
-	private float charge = 0f, dragX, dragY;
+	private float charge = 0f, touchX, touchY, dX, dY;
 	private Context context;
 	private SoundPool sounds;
 	private HashMap<String, Integer> soundLbls;
+	
+	private short touchCounter = 0; 
 	
 	//for debug
 //	private Point gunCenter;
@@ -113,7 +115,7 @@ public class ForegroundView extends SurfaceView implements SurfaceHolder.Callbac
 		}
 		
 		else if(init) {
-			enemy.init();
+			enemy.init(level);
 		}
 		
 		if(player == null) {
@@ -124,8 +126,8 @@ public class ForegroundView extends SurfaceView implements SurfaceHolder.Callbac
 			player.init();
 		}
 		
-		dragX = player.getX();
-		dragY = player.getY();
+		touchX = player.getX();
+		touchY = player.getY();
 			
 		if(guns == null) {
 			guns = enemy.getGuns();
@@ -186,12 +188,12 @@ public class ForegroundView extends SurfaceView implements SurfaceHolder.Callbac
 			enemy.update(canvas.getHeight());
 		
 			if(!useSensor) {
-			    double dX = player.getX() - dragX, dY = player.getY() - dragY;
-System.out.println(""+dX+' '+dY);
-			    player.setSpeed(Math.atan2(dX, -dY), Math.sqrt(dX*dX+dY*dY));
+			    player.setSpeed(Math.atan2(dX, dY), Math.sqrt(dX*dX+dY*dY));
 			}
 			
-			player.update(canvas.getWidth(), canvas.getHeight(), !isPaused && !init && !gameOver);
+			synchronized(player) {
+			    player.update(canvas.getWidth(), canvas.getHeight(), !isPaused && !init && !gameOver && !lvlClear);
+			}
 			
 			if(!init && !isPaused && !lvlClear) {
 				shots.addAll(enemy.fireGuns());
@@ -203,15 +205,27 @@ System.out.println(""+dX+' '+dY);
 			while(iter.hasNext()) {
 				shot = iter.next();
 				shot.update(!isPaused);
-/*
-				if(!gameOver && checkForHit(shot)) {
+
+				if(!godMode && !gameOver && checkForHit(shot)) {
 					//TODO: handle game over
 					player.startExplosion();
 					
 					gameOver = true;
+					
+				      ((Activity)getContext()).runOnUiThread(new Runnable() {
+
+				            @Override
+				            public void run() {
+    				            FragmentManager fragMan = ((Activity)context).getFragmentManager();
+    				            ((GameFragment)fragMan.findFragmentByTag(
+    				                fragMan.getBackStackEntryAt(fragMan.getBackStackEntryCount()-1)
+    				                    .getName()))
+				                    .saveScore();
+				            }
+				        });
 				}
 		
-				else */if(shot.getX() > canvas.getWidth()+25 || shot.getX() < -25 ||
+				if(shot.getX() > canvas.getWidth()+25 || shot.getX() < -25 ||
 					shot.getY() < -25 || shot.getY() > canvas.getHeight()+25 ||
 					checkEMPHit(shot)) 
 				{
@@ -238,11 +252,11 @@ System.out.println(""+dX+' '+dY);
 			for(Shot shot : shots) {
 				shot.draw(canvas);
 			}
-			
-			updateAndDrawCharge(canvas);
-			
+
+		    updateAndDrawCharge(canvas);
+
 			canvas.drawBitmap(pauseButton, pauseSrc, pauseDest, null);
-		
+
 			textPaint.setTextSize(32);
 			textPaint.setTextAlign(Align.LEFT);
 			
@@ -259,7 +273,7 @@ System.out.println(""+dX+' '+dY);
 				canvas.drawText(Long.toString(3 - (curTime - startTime)/1000), canvas.getWidth()/2, 0.6f*canvas.getHeight(), textPaint);
 				
 				if(curTime - startTime >= 3000) {
-					startTime += 3000;
+					startTime = System.currentTimeMillis();
 					init = false;
 				}
 			}
@@ -278,6 +292,11 @@ System.out.println(""+dX+' '+dY);
 		}
 	}
 	
+	/**
+	 * Determines whether or not a Shot has crossed the EMP wave.
+	 * @param shot the Shot to check
+	 * @return true if the distance between the Shot and Player less than 100 pixels less than the EMP radius 
+	 */
 	private boolean checkEMPHit(Shot shot) {
 		boolean result = false;
 		
@@ -307,26 +326,25 @@ System.out.println(""+dX+' '+dY);
 		int meterHeight;
 		
 		if(!init) {
-			if(!isPaused && !gameOver) {
-				charge += 1f/(30f*25f);
-			}
+			if(!isPaused && !gameOver && !lvlClear) {
+				charge += 1f/665f;
 			
-			if(charge > 1f) {
-				charge = 1f;
-				
-				if(!lvlClear) {
-					player.setBeamState(true);
-					
-					dragX = player.getX();
-					dragY = player.getY();
-					
-					lvlClear = true;
-				}
-				
-				else {
-					//TODO: handle level clear
-					enemy.startExplosion();
-				}
+    			if(charge > 1f) {
+    				charge = 1f;
+    
+    				player.setBeamState(true);
+    
+    				enemy.startExplosion();
+    			
+    				//TODO: add delay
+    				saveLvlScore();
+    
+    				dX = dY = 0;
+    
+    				lvlClear = true;
+    				
+    				guns.clear();
+    			}
 			}
 		
 			meterHeight = (int)(charge*(canvas.getHeight() - 5 - canvas.getHeight()/2));
@@ -359,13 +377,15 @@ System.out.println(""+dX+' '+dY);
 	private boolean checkForHit(Shot shot) {
 		playerHitbox = new RectF(player.getHitbox());
 		
+		Bitmap playerSprite = player.getSprite(), shotSprite = shot.getSprite();
+		
 		boolean result = false;
 		
 		if(playerHitbox.intersect(shot.getHitbox())) {
 			for(int i = (int)playerHitbox.left; i < playerHitbox.right && !result; i++) {
 				for(int j = (int)playerHitbox.top; j < playerHitbox.bottom && !result; j++) {
-					if(player.getSprite().getPixel(i - (int)playerHitbox.left, j - (int)playerHitbox.top) == 
-						shot.getSprite().getPixel(i - (int)playerHitbox.left, j - (int)playerHitbox.top)) 
+					if(playerSprite.getPixel(i - (int)playerHitbox.left, j - (int)playerHitbox.top) == 
+						shotSprite.getPixel(i - (int)playerHitbox.left, j - (int)playerHitbox.top)) 
 					{
 						result = true;
 					}
@@ -377,12 +397,8 @@ System.out.println(""+dX+' '+dY);
 		
 	}
 	
-	public short getDifficulty() {
-		return difficulty;
-	}
-	
 	public void initParams(short difficulty, int level, int score, int[] enemyIds,
-        SoundPool sounds, HashMap<String, Integer> soundLbls, boolean useSensor)
+        SoundPool sounds, HashMap<String, Integer> soundLbls, boolean useSensor, boolean godMode)
 	{
 		this.difficulty = difficulty;
 		this.level = level;
@@ -390,6 +406,7 @@ System.out.println(""+dX+' '+dY);
 		this.soundLbls = soundLbls;
 		this.sounds = sounds;
 		this.useSensor = useSensor;
+		this.godMode = godMode;
 	}
 	
 	public Player getPlayer() {
@@ -482,21 +499,38 @@ System.out.println(""+dX+' '+dY);
 	}
 	
 	/**
-	 * Called when the level is complete.
+	 * Generates the score for the current level.
 	 * @return the score for the level
 	 */
-	public int levelComplete() {
-		guns.clear();
+	public void saveLvlScore() {
+		/*guns.clear();
 		shots.clear();
 		
-		player.init();
-//TODO: time multiplier
-		return difficulty * ((1000*level) + (playTime));
+		player.init();*/
+      ((Activity)getContext()).runOnUiThread(new Runnable() {
+
+            @Override
+            public void run() {
+      
+    	    playTime += (int)(System.currentTimeMillis() - startTime);
+    	    int baseScore = (1+level) * 500;
+    	    int timeScore = playTime/1000;
+    	    int lvlScore = difficulty * ((500*(level+1)) + (10000000/playTime));
+            
+    		FragmentManager fragMan = ((Activity)context).getFragmentManager();
+            ((GameFragment)fragMan.findFragmentByTag(
+                fragMan.getBackStackEntryAt(fragMan.getBackStackEntryCount()-1)
+                    .getName()))
+                .updateScore(baseScore, timeScore, lvlScore);
+            }
+        });
 	}
 	
 	@Override
 	public boolean onTouchEvent(MotionEvent e) {
-        if(!init && !gameOver && !lvlClear) {
+	  //  touchCounter = (short) ((++touchCounter) % 10);
+	    
+        if(/*touchCounter == 0 && */!init && !gameOver && !lvlClear) {
             switch(e.getAction() & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_DOWN:
     	    	if(pauseDest.contains((int)e.getX(), (int)e.getY())) {
@@ -512,8 +546,8 @@ System.out.println(""+dX+' '+dY);
     			}
     	    	
     	    	else if(!useSensor) {
-    	    	    dragX = e.getX();
-    	    	    dragY = e.getY();
+    	    	    touchX = e.getX();
+    	    	    touchY = e.getY();
     	    	}
                 
                 break;
@@ -528,27 +562,30 @@ System.out.println(""+dX+' '+dY);
     			break;
     			
             case MotionEvent.ACTION_MOVE:
-                if(!useSensor) {
-                    dragX = e.getX();
-                    dragY = e.getY();
+                if(!useSensor && !lvlClear) {
+                    dX = touchX - e.getX();
+                    dY = e.getY() - touchY;
                 }
-                
-                try {
-                    Thread.sleep(25);
-                }
-                
-                catch (InterruptedException e1) {
-                    e1.printStackTrace();
-                }
-                
+
                 break;
                 
             case MotionEvent.ACTION_UP:
-                dragX = player.getX();
-                dragY = player.getY();
+                dX = dY = 0;
+                
+                break;
 		    }
 	    }
-	    
+      
+        synchronized(this) {
+            try {
+                wait(25);
+            }
+            
+            catch (InterruptedException e1) {
+                e1.printStackTrace();
+            }
+        }
+
 		return true;
 	}
 	
@@ -563,8 +600,12 @@ System.out.println(""+dX+' '+dY);
 			startTime = System.currentTimeMillis();
 		}
 	}
-	
-	public void setInit(boolean state) {
-		init = state;
-	}
+
+	/**
+	 * Sets the game initialization flag.
+	 * @param state whether or not to initialize the game state
+	 */
+    public void setInit(boolean state) {
+        init = state;
+    }
 }
