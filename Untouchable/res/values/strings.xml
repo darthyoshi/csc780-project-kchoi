@@ -1,33 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Untouchable</string>
     <string name="action_settings">Settings</string>
+    
+    <!-- title screen -->
+    <string name="app_name">Untouchable</string>
     <string name="menu_start">Start Game</string>
     <string name="menu_options">Options</string>
     <string name="menu_scores">High Scores</string>
-    <string name="instructions">Instructions go here. Instructions go here. Instructions go here. Instructions go here. Instructions go here. Instructions go here.</string>
+    
+    <!-- dialog text -->
     <string name="confirm">OK</string>
     <string name="cancel">Cancel</string>
-    <string name="done">Return to Main Menu</string>
-    <string name="hard">Hard</string>
-    <string name="normal">Normal</string>
-    <string name="easy">Easy</string>
-    <string name="difficulty">Select Difficulty</string>
-    <string name="game_over">Game Over</string>
-    <string name="level">Stage: </string>
-    <string name="score">Score: </string>
-    <string name="lvlResult">Level Result</string>
-    <string name="tmp">n.a.</string>
     <string name="cont">Continue</string>
     <string name="quit">Quit</string>
     <string name="resume">Resume</string>
-    <string name="debug">Debug</string>
+    <string name="hiScoreMsg">Congratulations, you have a high score!</string>
     
+    <!-- game text -->
+    <string name="game_over">Game Over</string>
+    <string name="level">Stage: </string>
+    <string name="score">Score: </string>
+    <string name="tmp">n.a.</string>
+    
+    <!-- results screen -->
+    <string name="lvlResult">Stage Result</string>
+    <string name="baseScore">Base Score</string>
+    <string name="timeBonus">Time Multiplier</string>
+    <string name="difficultyBonus">Difficulty Multiplier</string>
+    <string name="lvlScore">Level Score</string>
+    <string name="totalScore">Total Score</string>
+    
+    <!-- difficulty -->
+    <string name="difficulty">Set Difficulty</string>
+    <string name="hard">Hard</string>
+    <string name="normal">Normal</string>
+    <string name="easy">Easy</string>
     <string-array name="difficulties" >
         <item>@string/easy</item>
         <item>@string/normal</item>
         <item>@string/hard</item>
     </string-array>
-        
+    
+    <!-- preferences -->
+    <string name="useSensor">Tilt the device to control the ship. Pausing will reset the rest position.</string>
+    <string name="tiltControl">Tilt Controls</string>
+    <string name="noSensor">To control the ship, slide your finger along the screen.</string>
+    <string name="resetScores">Reset Scores</string>
+    <string name="resetWarning">Warning: this cannot be undone.</string>
+    <string name="resetQuestion">Really reset scores? This cannot be undone.</string>
+
+    <!-- debug text -->
+    <string name="debug">Debug</string>
+    <string name="godMode">God Mode</string>        
+    <string name="godModeOn">The player ship is invincble.</string>
+    <string name="godModeOff">The player ship is not invincble.</string>
+    <string name="fastTime">Accelerated Charge</string>
+    <string name="fastTimeSummary">Charge meter fills more quickly.</string>
+    
 </resources>

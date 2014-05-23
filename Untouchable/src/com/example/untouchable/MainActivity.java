@@ -15,9 +15,6 @@ import com.example.untouchable.fragments.*;
 public class MainActivity extends Activity {
 	private Fragment frag;
 	
-    /**
-     *  @param savedInstanceState
-     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,8 +37,8 @@ public class MainActivity extends Activity {
 	}
     
     /**
-     *  
-     *  @param v
+     *  Callback method for handling click events. 
+     *  @param v the View initiating this method
      */
     public void onClick(View v) {
     	frag = getActiveFragment();
@@ -55,6 +52,10 @@ public class MainActivity extends Activity {
 		}
     }
 
+    /**
+     * Retrieves the active Fragment.
+     * @return the Fragment at the top of the stack
+     */
     private Fragment getActiveFragment() {
     	FragmentManager fragMan = getFragmentManager();
     	Fragment result = null;
@@ -74,22 +75,30 @@ public class MainActivity extends Activity {
         FragmentManager fragMan = getFragmentManager();
     	frag = getActiveFragment();
     	
-    	String tag = frag.getTag();
-    	
-    	if(tag.equals("GAME_FRAGMENT")) {
-    		((GameFragment)frag).onBackPressed();
+    	switch(frag.getTag()) {
+    	case "GAME_FRAGMENT":
+    	    ((GameFragment)frag).onBackPressed();
+    	    
+    	    break;
+    	    
+    	case "SCORE_FRAGMENT":
+    	    fragMan.popBackStack("TITLE_FRAGMENT", 0);
+    	    
+    	    break;
+    	    
+    	case "RESULT_FRAGMENT":
+    	    ((ResultFragment)frag).onBackPressed();
+    	    
+    	    break;
+    	    
+	    default:
+	        if(fragMan.getBackStackEntryCount() > 1) {
+        		super.onBackPressed();
+        	}
+        	
+        	else {
+        		finish();
+        	}
     	}
-    	
-    	else if(tag.equals("SCORE_FRAGMENT") || tag.equals("RESULT_FRAGMENT")) {
-	        fragMan.popBackStack("TITLE_FRAGMENT", 0);
-    	}
-    	
-    	else if(fragMan.getBackStackEntryCount() > 1) {
-    		super.onBackPressed();
-    	}
-    	
-    	else {
-    		finish();
-    	}
-    }
+	}
 }

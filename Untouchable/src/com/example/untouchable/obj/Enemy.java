@@ -16,15 +16,17 @@ import android.media.SoundPool;
 import com.example.untouchable.R;
 
 public class Enemy extends GameObject {
-	private ArrayList<Gun> guns;
+	private ArrayList<Gun> guns = null;
 	private int type;
 	private Bitmap exhaust;
-	private static int height, width, frame = 0;
-	private static Rect src, dst;
+	private int height, width, frame = 0;
+	private Rect src, dst;
 	private static Paint exhaustAlpha;
 	private static Bitmap explosion = null;
 	private boolean explode = false;
 	private ArrayList<Point> explosions = null;
+	private int[] explosionTimes = null;
+	private final short numExplosions = 5;
 	
 	/**
 	 * Class constructor.
@@ -36,8 +38,6 @@ public class Enemy extends GameObject {
 	public Enemy(int type, Context context, SoundPool sounds, HashMap<String, Integer> soundLbls) {
 		super(context, sounds, soundLbls);
 		
-		this.type = type;
-	
 		exhaustAlpha = new Paint();
 		exhaustAlpha.setAlpha(192);
 		
@@ -50,7 +50,10 @@ public class Enemy extends GameObject {
 	 */
 	public void init(int type) {
 		TypedArray tmpArray = context.getResources().obtainTypedArray(R.array.enemy_sprites);
-		int spriteIds = tmpArray.getResourceId(type, -1);
+		
+		this.type = type % tmpArray.length();
+
+		int spriteIds = tmpArray.getResourceId(this.type, -1);
 		tmpArray.recycle();
 		
 		tmpArray = context.getResources().obtainTypedArray(spriteIds);
@@ -85,6 +88,8 @@ public class Enemy extends GameObject {
 		    explosions.clear();
 		}
 		
+		explode = false;
+		
 		genGuns();
 	}
 	
@@ -92,8 +97,14 @@ public class Enemy extends GameObject {
 	 * Determines the Gun layout for the Enemy and generates the Gun objects.
 	 */
 	private void genGuns() {
-		guns = new ArrayList<Gun>();
-		
+	    if(guns == null) {
+	        guns = new ArrayList<Gun>();
+	    }
+	    
+	    else {
+	        guns.clear();
+	    }
+
 		short i;
 		
 		switch(type) {
@@ -107,8 +118,8 @@ public class Enemy extends GameObject {
 		
 		case 1:
 			for(i = 0; i < 2; i++) {
-				guns.add(new Gun(x + width/20 + i*width/5, y + (int)((1.5f+i*6f/6)*height/6), (int)(Math.random()*5), context, sounds, soundLbls));
-				guns.add(new Gun(x + 19*width/20 - i*width/5, y + (int)((1.5f+i*6f/6)*height/6), (int)(Math.random()*5), context, sounds, soundLbls));
+				guns.add(new Gun(x + width/20 + i*width/5, y + (int)((1.5f+i*6f/6)*height/6), 2*i, context, sounds, soundLbls));
+				guns.add(new Gun(x + 19*width/20 - i*width/5, y + (int)((1.5f+i*6f/6)*height/6), 2*i+1, context, sounds, soundLbls));
 			}
 			
 			guns.add(new Gun(x + width/2, y + height/2, i, context, sounds, soundLbls));
@@ -120,7 +131,7 @@ public class Enemy extends GameObject {
 			
 			for(i = -1; i < 2; i += 2){
 				guns.add(new Gun(x + width/2 + i*(int)(0.15*width), y + 26*height/86, (int)(Math.random()*5), context, sounds, soundLbls));
-				guns.add(new Gun(x + width/2 + i*4*width/10, 36*height/86, (int)(Math.random()*5), context, sounds, soundLbls));
+				guns.add(new Gun(x + width/2 + i*4*width/10, y + 36*height/86, (int)(Math.random()*5), context, sounds, soundLbls));
 			}
 			
 			break;
@@ -198,32 +209,65 @@ public class Enemy extends GameObject {
 		dst = new Rect(x, y, x + width, y + height);
 	}
 	
+	@Override
 	public void draw(Canvas canvas) {
-		canvas.drawBitmap(exhaust, src, dst, exhaustAlpha);
-		canvas.drawBitmap(sprite, dst.left, dst.top, null);
+		if(!explode) {
+		    canvas.drawBitmap(exhaust, src, dst, exhaustAlpha);
+	    }
 		
-		if(explode) {
+	    canvas.drawBitmap(sprite, dst.left, dst.top, null);
+		
+	    if(explode) {
 			drawExplosion(canvas);
 		}
 	}
 	
+	/**
+	 * Draws the explosions.
+	 * @param canvas the drawing surface
+	 */
 	private void drawExplosion(Canvas canvas) {
-	    if(frame % 2 == 0) {
-	        for(Point point : explosions) {
-	            canvas.drawBitmap(explosion, point.x, point.y, null);
-	        }
+	    Point point;
+        
+        for(short i = 0; i < numExplosions; i++) {
+            point = explosions.get(i);
+            
+            canvas.drawBitmap(explosion, point.x, point.y, exhaustAlpha);
+            
+            if(--explosionTimes[i] == 0){
+                explosionTimes[i] = (int)(Math.random()*10) + 10;
+                
+                explosions.set(i, explosion());
+            }
 	    }
 	}
 
+	/**
+	 * Starts the explosion animation.
+	 */
 	public void startExplosion() {
 		explode = true;
-		
-        sounds.play(soundLbls.get("explosion_long"), .125f, .125f, 1, 0, 1);
         
-        for(short i = 0; i < 10; i++) {
-            explosions.add(new Point((int)(Math.random()*sprite.getWidth()/2), (int)(Math.random()*sprite.getHeight()/2)));
+        if(explosionTimes == null) {
+            explosionTimes = new int[numExplosions];
+        }
+        
+        for(short i = 0; i < numExplosions; i++) {
+            explosions.add(explosion());
+            
+            explosionTimes[i] = (int)(Math.random()*10) + 10;
         }
         
         guns.clear();
+	}
+	
+	/**
+	 * Generates a new explosion.
+	 * @return the central coordinates of the new explosion
+	 */
+	private Point explosion() {
+		sounds.play(soundLbls.get("explosion_long"), .125f, .125f, 1, 0, 1);
+        
+	    return new Point((int)(Math.random()/2*(sprite.getWidth() * 1.25f)), (int)(Math.random()/2*.9*sprite.getHeight()));
 	}
 }

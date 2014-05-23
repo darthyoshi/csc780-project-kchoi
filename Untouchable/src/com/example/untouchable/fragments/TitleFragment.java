@@ -7,13 +7,8 @@ import android.os.Bundle;
 import android.view.*;
 
 public class TitleFragment extends Fragment {
-    /**
-     *  @param inflater
-     *  @param container
-     *  @param savedInstanceState
-     *  @return
-     */
-	@Override
+    
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
         Bundle savedInstanceState) 
 	{
@@ -22,7 +17,7 @@ public class TitleFragment extends Fragment {
 	}
 	
     /**
-     * 
+     * Callback method for a click event. 
      * @param v the View initiating this method 
      */
     public void onClick(View v) {
@@ -33,6 +28,7 @@ public class TitleFragment extends Fragment {
 		case R.id.startButton:
 			tag = "GAME_FRAGMENT";
 			frag = new GameFragment();
+			((GameFragment)frag).setLevel(0);
 			
 			break;
 			

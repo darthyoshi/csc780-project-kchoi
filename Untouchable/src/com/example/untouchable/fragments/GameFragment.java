@@ -22,7 +22,7 @@ import android.view.*;
 public class GameFragment extends Fragment implements SensorEventListener {
 	private float xInit, yInit;
 	private float dX, dY, dZ;
-	private boolean initSensor = false, useSensor, initGame, godMode;
+	private boolean initSensor = false, useSensor, godMode, accelTime;
 	private short difficulty, azimuth, altitude;
 	private int score = 0, level;
 	private ForegroundView fg;
@@ -34,12 +34,7 @@ public class GameFragment extends Fragment implements SensorEventListener {
 	private float zInit, initAz, initAl;
 	private TextView lblX, lblX2, lblY, lblY2, lblZ, lblZ2, lblAz, lblAz2, lblAl, lblAl2;
 */
-	/**
-     *  @param inflater
-     *  @param container
-     *  @param savedInstanceState
-     *  @return
-     */
+
 	@Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
         Bundle savedInstanceState) 
@@ -76,14 +71,7 @@ public class GameFragment extends Fragment implements SensorEventListener {
 		
 		godMode = prefs.getBoolean("godMode", false);
 		
-		TypedArray enemyIds = parent.getResources().obtainTypedArray(R.array.enemy_sprites);
-		
-		int[] enemySpriteIds = new int[enemyIds.length()];
-		for(short i = 0; i < enemySpriteIds.length; i++) {
-			enemySpriteIds[i] = enemyIds.getResourceId(i, 0);
-		}
-		
-		enemyIds.recycle();
+		accelTime = prefs.getBoolean("accelTime", false);
 /*
 		{	//for debug
 			lblX = (TextView)parent.findViewById(R.id.lblX);
@@ -136,7 +124,7 @@ public class GameFragment extends Fragment implements SensorEventListener {
         }
 
 		fg = (ForegroundView)parent.findViewById(R.id.fg);
-        fg.initParams(difficulty, level, score, enemySpriteIds, sounds, soundLbls, useSensor, godMode);
+        fg.initParams(difficulty, level, score, sounds, soundLbls, useSensor, godMode, accelTime);
 	}
 	
 	@Override
@@ -206,6 +194,7 @@ public class GameFragment extends Fragment implements SensorEventListener {
 		fg.pauseThread();
 	}
 
+	@Override
 	public void onDestroy() {
 		super.onDestroy();
 	}
@@ -217,6 +206,9 @@ public class GameFragment extends Fragment implements SensorEventListener {
 		this.difficulty = difficulty;
 	}
 	
+	/**
+	 * Callback method for the back button.
+	 */
 	public void onBackPressed() {
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 		
@@ -250,26 +242,27 @@ public class GameFragment extends Fragment implements SensorEventListener {
 		dialog.show();
 	}
 
-
 	/**
+	 * Retrieves the current score.
 	 * @return the score
 	 */
 	public int getScore() {
 		return score;
 	}
 
-
 	/**
 	 * Increments the score for the current game session.
-	 * @param baseScore the score to add
+	 * @param baseScore the base score for the level
+	 * @param timeBonus the time bonus multiplier
+	 * @param lvlScore the total score for the level
 	 */
-	public void updateScore(int baseScore, int timeScore, int lvlScore) {
+	public void updateScore(int baseScore, float timeBonus, int lvlScore) {
 		score += lvlScore;
 		
   		String tag = "RESULT_FRAGMENT";
 	    Fragment frag = new ResultFragment();
 
-	    ((ResultFragment)frag).setParams(baseScore, timeScore, difficulty, lvlScore, score);
+	    ((ResultFragment)frag).setParams(baseScore, timeBonus, difficulty, lvlScore, score);
 	    
 	    getFragmentManager()
 	        .beginTransaction()
@@ -287,6 +280,9 @@ public class GameFragment extends Fragment implements SensorEventListener {
 		initSensor = state;
 	}
 
+	/**
+	 * Stores the score for the current session.
+	 */
     public void saveScore() {
         String tag = "SCORE_FRAGMENT";
         Fragment frag = new HiScoreFragment();
@@ -300,5 +296,24 @@ public class GameFragment extends Fragment implements SensorEventListener {
             .show(frag)
             .commit();
         
+    }
+    
+    /**
+     * Increments the stage number.
+     */
+    public void nextLevel() {
+        level++;
+        
+        if(fg != null) {
+            fg.reset(level);
+        }
+    }
+    
+    /**
+     * Sets the stage number.
+     * @param level the new stage number
+     */
+    public void setLevel(int level) {
+        this.level = level;
     }
 }

@@ -46,7 +46,7 @@ public class Gun extends GameObject {
 	}
 
 	/**
-	 * 
+	 * Updates the position and bearing of the Gun.
 	 * @param canvas the drawing surface
 	 */
 	public void update() {
@@ -54,6 +54,7 @@ public class Gun extends GameObject {
 		matrix.postTranslate(x-width/2, y-(int)(height/3.6f));
 	}
 	
+	@Override
 	public void draw(Canvas canvas) {
 		canvas.drawBitmap(sprite, matrix, null);
 		
@@ -69,7 +70,7 @@ public class Gun extends GameObject {
 	}
 	
 	/**
-	 * 
+	 * Adjusts the aim of the Gun.
 	 * @param targetX the x coordinate to aim for
 	 * @param targetY the y coordinate to aim for
 	 */
@@ -77,6 +78,10 @@ public class Gun extends GameObject {
 		bearing = Math.atan2(x - targetX, targetY - y);
 	}
 	
+	/**
+	 * Fires the Gun.
+	 * @return an ArrayList containing the newly fired Shots
+	 */
 	public ArrayList<Shot> fireGun() {
 		ArrayList<Shot> result = new ArrayList<Shot>();
 		
@@ -101,7 +106,7 @@ public class Gun extends GameObject {
 		    
 		case 2:
 		case 3:
-		    offset = (pattern == 3 ? Math.toRadians(10*spread - 55) : Math.toRadians(55 - 10*spread));
+		    offset = (pattern == 3 ? Math.toRadians(10*spread - 50) : Math.toRadians(50 - 10*spread));
 
             result.add(new Shot(x, y, bearing + offset, 5+difficulty*5, context, sounds, soundLbls));
 
@@ -122,14 +127,26 @@ public class Gun extends GameObject {
 		return result;
 	}
 	
+	/**
+	 * Retrieves the center of the Gun.
+	 * @return a Point containing the center x-y coordinates
+	 */
 	public Point getCenter() {
 		return new Point(x, y);
 	}
 
+	/**
+	 * Sets the difficulty level of the Gun.
+	 * @param difficulty the difficulty level
+	 */
 	public void setDifficulty(short difficulty) {
 		this.difficulty = difficulty;
 	}
 	
+	/**
+	 * Retrieves the cooldown value of the Gun.
+	 * @return the frames left before the Gun fires again
+	 */
 	public short getFireTimer() {
 	    if(pattern == 1) {
 	        coolDown = (short) (++coolDown % (25f/difficulty));
@@ -155,10 +172,13 @@ public class Gun extends GameObject {
 		else {
 		    coolDown--;
 		}
-	    //if(pattern==1)System.out.println(coolDown);
+	    
 		return coolDown;
 	}
 
+	/**
+	 * Sets the initial parameters of the Gun.
+	 */
     public void init() {
         init = true;
         coolDown = 0;

@@ -17,8 +17,8 @@ import android.widget.*;
 import com.example.untouchable.R;
 
 public class HiScoreFragment extends Fragment {
-    private ArrayList<Integer> scores = null;
-    private ArrayList<String> names = null;
+    private ArrayList<Integer> scores = new ArrayList<Integer>();
+    private ArrayList<String> names = new ArrayList<String>();
     private int score = -1;
     private EditText input = null;
     
@@ -28,13 +28,7 @@ public class HiScoreFragment extends Fragment {
     	
     	Activity parent = getActivity();
     	
-    	if(scores == null) {
-	    	scores = ScoreManager.readScores(parent);
-    	}
-    	
-    	if(names == null) {
-    	    names = ScoreManager.readNames(parent);
-    	}
+    	ScoreManager.readScores(parent, scores, names);
     	
     	if(score >= scores.get(scores.size()-1)) {
     	    saveEntry(parent);
@@ -43,12 +37,6 @@ public class HiScoreFragment extends Fragment {
     	populateTable(parent);
     }
     
-	/**
-     *  @param inflater
-     *  @param container
-     *  @param savedInstanceState
-     *  @return
-     */
 	@Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
         Bundle savedInstanceState) 
@@ -65,11 +53,19 @@ public class HiScoreFragment extends Fragment {
 	        ScoreManager.saveScores(scores, names, getActivity());
 		}
 	}
-	
+
+	/**
+	 * Sets the score for the current session.
+	 * @param score the score to save
+	 */
     public void setScore(int score) {
-        this.score = 2001/*score*/;
+        this.score = score;
     }
     
+    /**
+     * Populates and displays the high score list.
+     * @param parent the parent Activity
+     */
     private void populateTable(Activity parent) {
         TableLayout table = (TableLayout)(parent.findViewById(R.id.score_list));
         
@@ -111,58 +107,64 @@ public class HiScoreFragment extends Fragment {
         else {
             for(i = 0; i < scores.size(); i++) {
                 row = (TableRow) table.getChildAt(i);
-System.out.println("blah");
+
                 ((TextView)row.getChildAt(1)).setText(Integer.toString(scores.get(i)));
                 ((TextView)row.getChildAt(2)).setText(names.get(i));
             }
         }
     }
     
-    private void saveEntry(Activity parent) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+    /**
+     * Gets the name for the new high score and saves the entry to memory.
+     * @param parent the parent Activity
+     */
+    private void saveEntry(final Activity parent) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(parent);
         
         if(input == null) {
             input = new EditText(parent);
         }
         
-        builder.setMessage("Congratulations, you have a high score!")
-            .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+        final short i = addScoreToList();
+        
+        builder.setMessage(parent.getResources().getString(R.string.hiScoreMsg))
+            .setView(input)
+            .setNegativeButton(parent.getResources().getString(R.string.cancel), new DialogInterface.OnClickListener() {
             
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    short i = addScoreToList();
-                    
                     names.add(i, "Faceless Monkey");
-                    
-                    names.remove(names.size() - 1);
-                    
-                    updateTable(getActivity());
-                    
+
                     dialog.dismiss();
                 }
             })
-            .setTitle("High Score")
             .setPositiveButton(parent.getResources().getString(R.string.confirm), new DialogInterface.OnClickListener() {
                 
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    short i = addScoreToList();
-                    
                     names.add(i, input.getText().toString());
-                    
-                    names.remove(names.size() - 1);
-                    
-                    updateTable(getActivity());
-                    
+
                     dialog.dismiss();
                 }
             })
-            .setView(input);
+            .setOnDismissListener(new DialogInterface.OnDismissListener() {
+                
+                @Override
+                public void onDismiss(DialogInterface dialog) {
+                    names.remove(names.size() - 1);
+                    
+                    updateTable(parent);
+                }
+            });
     
         AlertDialog dialog = builder.create();
         dialog.show();        
     }
     
+    /**
+     * Saves the new high score values to memory.
+     * @return the index of the new high score value 
+     */
     private short addScoreToList() {
         short i;
         for(i = 0; i < scores.size() && scores.get(i) > score; i++);

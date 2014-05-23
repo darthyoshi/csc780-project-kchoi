@@ -6,9 +6,8 @@ package com.example.untouchable.fragments;
 
 import com.example.untouchable.*;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.content.SharedPreferences;
+import android.app.*;
+import android.content.*;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
 import android.preference.*;
@@ -22,26 +21,28 @@ public class PreferencesFragment extends PreferenceFragment implements OnSharedP
         // Load the preferences from an XML resource
         addPreferencesFromResource(R.xml.preferences);
         
+        final Activity parent = getActivity();
+        
         findPreference("resetScores").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             
             @Override
             public boolean onPreferenceClick(Preference preference) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                 
-                builder.setMessage("Really reset scores? This cannot be undone.")
-                    .setNegativeButton(getActivity().getResources().getString(R.string.cancel), new DialogInterface.OnClickListener() {
+                builder.setMessage(parent.getResources().getString(R.string.resetQuestion))
+                    .setNegativeButton(parent.getResources().getString(R.string.cancel), new DialogInterface.OnClickListener() {
                     
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             dialog.dismiss();
                         }
                     })
-                    .setTitle("Reset Scores")
-                    .setPositiveButton(getActivity().getResources().getString(R.string.confirm), new DialogInterface.OnClickListener() {
+                    .setTitle(parent.getResources().getString(R.string.resetScores))
+                    .setPositiveButton(parent.getResources().getString(R.string.confirm), new DialogInterface.OnClickListener() {
                         
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            ScoreManager.resetScores(getActivity());
+                            ScoreManager.resetScores(parent);
                             dialog.dismiss();
                         }
                     })
@@ -58,6 +59,7 @@ public class PreferencesFragment extends PreferenceFragment implements OnSharedP
     
     @Override
     public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
+        //updates description to show current difficulty
         if(key.equals("difficulty")) {
             Preference pref = findPreference(key);
             pref.setSummary(((ListPreference)pref).getEntry());

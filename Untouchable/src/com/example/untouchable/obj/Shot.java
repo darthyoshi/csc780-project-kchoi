@@ -51,6 +51,7 @@ public class Shot extends GameObject {
 	}
 
 	/**
+	 * Retrieves the velocity of the Shot in pixels per frame.
 	 * @return the velocity
 	 */
 	public double getSpeed() {
@@ -58,14 +59,15 @@ public class Shot extends GameObject {
 	}
 
 	/**
-	 * @param velocity the velocity to set
+	 * Sets the velocity of the Shot in pixels per frame.
+	 * @param velocity the new velocity
 	 */
 	public void setSpeed(double speed) {
 		this.speed = speed;
 	}
 
 	/**
-	 * Updates the position of the Shot and draws the sprite. 
+	 * Updates the position of the Shot. 
 	 * @param canvas the drawing surface
 	 * @param move whether or not the Shot should be moving
 	 */
@@ -83,16 +85,14 @@ public class Shot extends GameObject {
 		y = (int)values[Matrix.MTRANS_Y];
 	}
 	
+	@Override
 	public void draw(Canvas canvas) {
 		canvas.drawBitmap(sprite, matrix, null);
 		
 	//	drawDebugHitbox(canvas);
 	}
 
-	/**
-	 * Draws the debug hitbox.
-	 * @param canvas the drawing surface
-	 */
+	@Override
 	protected void drawDebugHitbox(Canvas canvas) {
 		RectF hitbox = getHitbox();
 		Paint paint = new Paint();

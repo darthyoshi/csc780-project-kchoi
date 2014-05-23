@@ -20,11 +20,10 @@ public class Player extends GameObject {
 	private int xSpeed = 0, ySpeed = 0;
 	private Rect src, dst;
 	private boolean fireBeam, expandBeam = true, emp = false, explode;
-	private int beamWidth = 1, empR = 0, streamId = 0;
-	private RectF empBox, playerBox;
+	private int beamWidth = 1, empR = 0;
+	private RectF empBox;
 	private static Bitmap exhaust = null, explosion = null;
 	private static Paint paint = null;
-	private static AudioTrack beamSound = null;
 	
 	/**
 	 * Class constructor.
@@ -53,21 +52,7 @@ public class Player extends GameObject {
 		}
 		
 		empBox = new RectF(0, 0, 0, 0);
-		playerBox = new RectF(0, 0, 0, 0);
 		
-        beamSound = new AudioTrack(
-                AudioManager.STREAM_MUSIC, 
-                22050, 
-                AudioFormat.CHANNEL_OUT_DEFAULT, 
-                AudioFormat.ENCODING_DEFAULT, 
-                17000, 
-                AudioTrack.MODE_STATIC
-        );
-        
-        //TODO: load "beamfire", convert to PCM
-        
-        //beamSound.write(pcmData, 0, pcmData.length);
-
 		init();
 	}
 
@@ -80,9 +65,6 @@ public class Player extends GameObject {
 		y = fg.getHeight() - height/2;
 		
 		xSpeed = ySpeed = 0;
-		
-		playerBox.set(x - (int)(6f/57*width), y - (int)(10f*height/141), 
-				x + (int)(6f*width/57), y + (int)(10f*height/141));
 		
 		src = new Rect(0, 0, width, height);
 		dst = new Rect(x - width/2, y - (int)(height/2.6f), x + width/2, y + (int)(height*(16f/26f)));
@@ -148,18 +130,23 @@ public class Player extends GameObject {
 		
 		if(!explode) {
 			canvas.drawBitmap(exhaust, src, dst, paint);
-			canvas.drawBitmap(sprite, dst.left, dst.top, null);
 		}
 		
-		else {
-			updateAndDrawExplosion(canvas);
+		canvas.drawBitmap(sprite, dst.left, dst.top, null);
+		
+		if(explode) {
+			drawExplosion(canvas);
 		}
 
 		if(emp) {
 			updateAndDrawEMP(canvas);
 		}
 		
-		//drawDebugHitbox(canvas);	
+/*		{   //for debug
+    		paint.setColor(Color.CYAN);
+    		canvas.drawCircle(x, y, 2, paint);
+		}
+*/
 	}
 	
 	/**
@@ -182,10 +169,8 @@ public class Player extends GameObject {
 		paint.setColor(Color.WHITE);
 		canvas.drawRect(center.x - tempWidth/3, 0, center.x + tempWidth/3, center.y - height/20, paint);
 		
-		//sounds.resume(streamId);
-		
 		if(expandBeam) {
-			beamWidth += 2;
+			beamWidth += 5;
 			
 			if(beamWidth > 100) {
 				expandBeam = false;
@@ -193,12 +178,10 @@ public class Player extends GameObject {
 		}
 		
 		else {
-			beamWidth -= 2;
+			beamWidth -= 5;
 			
 			if(beamWidth < 1) {
 				fireBeam = false;
-				
-	//			sounds.stop(streamId);
 			}
 		}
 	}
@@ -216,20 +199,6 @@ public class Player extends GameObject {
 		xSpeed = (int) (Math.sin(azimuth)*-mag);
 		ySpeed = (int) (Math.cos(azimuth)*mag);
 	}
-
-	/**
-	 * Draws the debug hitbox.
-	 * @param canvas the drawing surface
-	 */
-	protected void drawDebugHitbox(Canvas canvas) {
-		//debug
-		RectF hitbox = getHitbox();
-		
-		paint.setStyle(Paint.Style.FILL_AND_STROKE);
-		paint.setColor(Color.RED);
-		
-		canvas.drawArc(hitbox, 0, 360, true, paint);
-	}
 	
 	/**
 	 * Returns the origin coordinates of the Player.
@@ -246,17 +215,6 @@ public class Player extends GameObject {
 	@Override
 	public RectF getBounds() {
 		return new RectF(x - width/2f, y - height/2.6f, x + width/2f, y + height*(16f/26f));
-	}
-	
-	/**
-	 * Returns the current hitbox of the Player.
-	 * @return a RectF that defines the bounds of the hitbox
-	 */	
-	public RectF getHitbox() {
-		playerBox.set(x - 6f/57f*width, y - 8f*height/141f, 
-				x + 6f*width/57f, y + 8f*height/141f);
-
-		return playerBox;
 	}
 	
 	/**
@@ -291,17 +249,12 @@ public class Player extends GameObject {
 	}
 	
 	/**
-	 * Sets whether or not the beam should be firing.
-	 * @param state the state of the beam
+	 * Activates the beam animation.
 	 */
-	public void setBeamState(boolean state) {
-		fireBeam = state;
+	public void startBeam() {
+		fireBeam = true;
 		
-		/*if(fireBeam) {
-			streamId = sounds.play(soundLbls.get("beamfire"), .5f, .5f, 1, -1, .5f);
-		}*/
-		
-	//	beamSound.play();
+		sounds.play(soundLbls.get("beamfire"), .5f, .5f, 1, -1, 1f);
 	}
 	
 	/**
@@ -323,15 +276,19 @@ public class Player extends GameObject {
 	}
 	
 	/**
-	 * 
+	 * Draws the explosion.
 	 * @param canvas the drawing surface
 	 */
-	private void updateAndDrawExplosion(Canvas canvas) {
+	private void drawExplosion(Canvas canvas) {
 		if(frame % 2 == 0) {
 		    canvas.drawBitmap(explosion, x-explosion.getWidth()/2, y-explosion.getHeight()/2, null);
 		}
 	}
 
+	/**
+	 * Retrieves the current beam state.
+	 * @return true if the beam has finished shrinking
+	 */
 	public boolean beamFinished() {
 	    return !(fireBeam && expandBeam);
 	}
