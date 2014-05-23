@@ -9,7 +9,8 @@
         android:layout_height="fill_parent"
         android:id="@+id/fg" />
 
-   	<!-- TableLayout 
+   	<!-- debug 
+   	<TableLayout 
    	    android:layout_below="@+id/score_lbl"
 	    android:layout_width="fill_parent"
 	    android:layout_height="fill_parent"
@@ -61,6 +62,7 @@
                 android:text="n.a." android:textColor="@color/white" />
         </TableRow>
 	    
-    </TableLayout --> 
+    </TableLayout>
+    --> 
     
 </RelativeLayout>

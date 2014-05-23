@@ -2,27 +2,29 @@ package com.example.untouchable.fragments;
 
 import java.io.*;
 import java.util.*;
-import java.util.Map.Entry;
 
 import android.content.Context;
 
 public class ScoreManager {
 
     /**
-     * Retrieves the score values from the file system.
+     * Retrieves the high scores from the file system.
      * @param context the execution context
      * @return an ArrayList containing the score values
      */
-    public static ArrayList<Integer> readScores(Context context) {
-        ArrayList<Integer> scores = new ArrayList<Integer>();
-
+    public static void readScores(Context context, ArrayList<Integer> scores, ArrayList<String> names) {
+        scores.clear();
+        names.clear();
+        
         BufferedReader reader = null;
         try {
+            //read saved scores
             reader = new BufferedReader(new InputStreamReader(context.openFileInput("myscores.csv")));
         }
         
-        catch(Exception e) {
+        catch(FileNotFoundException e) {
             try {
+                //read default scores
                 reader = new BufferedReader(new InputStreamReader(context.getAssets().open("scores.csv")));
             }
             
@@ -40,50 +42,6 @@ public class ScoreManager {
                         words = line.split(",");
                         
                         scores.add(Integer.parseInt(words[0]));
-                    }
-    
-                    reader.close();
-                }
-                
-                catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        
-        return scores;
-    }
-    
-    /**
-     * Retrieves the score names from the file system.
-     * @param context the execution context
-     * @return an ArrayList containing the score names
-     */
-    public static ArrayList<String> readNames(Context context) {
-        ArrayList<String> names = new ArrayList<String>();
-
-        BufferedReader reader = null;
-        try {
-            reader = new BufferedReader(new InputStreamReader(context.openFileInput("myscores.csv")));
-        }
-        
-        catch(Exception e) {
-            try {
-                reader = new BufferedReader(new InputStreamReader(context.getAssets().open("scores.csv")));
-            }
-            
-            catch(Exception e1) {
-                e1.printStackTrace();
-            }
-        }
-        
-        finally {
-            if(reader != null) {
-                try {
-                    String line;
-                    String[] words;
-                    while((line = reader.readLine()) != null) {
-                        words = line.split(",");
                         
                         names.add(words[1]);
                     }
@@ -96,8 +54,6 @@ public class ScoreManager {
                 }
             }
         }
-        
-        return names;
     }
 
     /**

@@ -104,28 +104,57 @@ public final class R {
         public static final int gunfire=0x7f050004;
     }
     public static final class string {
-        public static final int action_settings=0x7f090001;
-        public static final int app_name=0x7f090000;
-        public static final int cancel=0x7f090007;
-        public static final int confirm=0x7f090006;
-        public static final int cont=0x7f090012;
-        public static final int debug=0x7f090015;
-        public static final int difficulty=0x7f09000c;
-        public static final int done=0x7f090008;
-        public static final int easy=0x7f09000b;
-        public static final int game_over=0x7f09000d;
-        public static final int hard=0x7f090009;
-        public static final int instructions=0x7f090005;
-        public static final int level=0x7f09000e;
-        public static final int lvlResult=0x7f090010;
+        public static final int action_settings=0x7f090000;
+        /**  title screen 
+         */
+        public static final int app_name=0x7f090001;
+        public static final int baseScore=0x7f090010;
+        public static final int cancel=0x7f090006;
+        /**  dialog options 
+         */
+        public static final int confirm=0x7f090005;
+        public static final int cont=0x7f090007;
+        /**  debug text 
+         */
+        public static final int debug=0x7f09001f;
+        /**  difficulty 
+         */
+        public static final int difficulty=0x7f090015;
+        public static final int difficultyBonus=0x7f090012;
+        public static final int easy=0x7f090018;
+        public static final int fastTime=0x7f090023;
+        public static final int fastTimeSummary=0x7f090024;
+        /**  game text 
+         */
+        public static final int game_over=0x7f09000b;
+        public static final int godMode=0x7f090020;
+        public static final int godModeOff=0x7f090022;
+        public static final int godModeOn=0x7f090021;
+        public static final int hard=0x7f090016;
+        public static final int hiScoreMsg=0x7f09000a;
+        public static final int level=0x7f09000c;
+        /**  results screen 
+         */
+        public static final int lvlResult=0x7f09000f;
+        public static final int lvlScore=0x7f090013;
         public static final int menu_options=0x7f090003;
         public static final int menu_scores=0x7f090004;
         public static final int menu_start=0x7f090002;
-        public static final int normal=0x7f09000a;
-        public static final int quit=0x7f090013;
-        public static final int resume=0x7f090014;
-        public static final int score=0x7f09000f;
-        public static final int tmp=0x7f090011;
+        public static final int noSensor=0x7f09001b;
+        public static final int normal=0x7f090017;
+        public static final int quit=0x7f090008;
+        public static final int resetQuestion=0x7f09001e;
+        public static final int resetScores=0x7f09001c;
+        public static final int resetWarning=0x7f09001d;
+        public static final int resume=0x7f090009;
+        public static final int score=0x7f09000d;
+        public static final int tiltControl=0x7f09001a;
+        public static final int timeBonus=0x7f090011;
+        public static final int tmp=0x7f09000e;
+        public static final int totalScore=0x7f090014;
+        /**  preferences 
+         */
+        public static final int useSensor=0x7f090019;
     }
     public static final class style {
         /** 

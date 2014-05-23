@@ -23,8 +23,8 @@ public class ForegroundView extends SurfaceView implements SurfaceHolder.Callbac
 	private GameLoopThread gameLoopThread;
 	private short difficulty = 2, frame = 0;
 	private int level = -1, playTime = 0, score;
-	private long startTime;
-	private boolean init = true, isPaused = true, lvlClear = false, gameOver = false, useSensor, godMode;
+	private long startTime, stopTime;
+	private boolean init = true, isPaused = true, lvlClear = false, gameOver = false, useSensor, godMode, accelTime;
 	private static Rect blank = null;
 	private static Paint erase = null;
 	private Iterator<Shot> iter;
@@ -33,14 +33,15 @@ public class ForegroundView extends SurfaceView implements SurfaceHolder.Callbac
 	private Paint meterPaint = null, textPaint = null;
 	private ArrayList<Gun> guns = null;
 	private static Bitmap pauseButton;
-	private RectF playerHitbox, shotHitbox;
+	private RectF shotHitbox, touchBox;
 	private Point playerCenter;
-	private float charge = 0f, touchX, touchY, dX, dY;
+	private float charge = 0f, dX, dY;
 	private Context context;
 	private SoundPool sounds;
 	private HashMap<String, Integer> soundLbls;
+	private FragmentManager fragMan;
 	
-	private short touchCounter = 0; 
+	private Runnable onGameOver;
 	
 	//for debug
 //	private Point gunCenter;
@@ -83,6 +84,19 @@ public class ForegroundView extends SurfaceView implements SurfaceHolder.Callbac
 		
 		pauseButton = BitmapFactory.decodeResource(context.getResources(), R.drawable.pause);
 		pauseSrc = new Rect(0, 0, pauseButton.getWidth(), pauseButton.getHeight());
+		
+		fragMan = ((Activity)context).getFragmentManager();
+		
+		onGameOver = new Runnable() {
+
+	        @Override
+	        public void run() {
+	            ((GameFragment)fragMan.findFragmentByTag(
+	                fragMan.getBackStackEntryAt(fragMan.getBackStackEntryCount()-1)
+	                    .getName()))
+	                .saveScore();
+	        }
+	    };
 	}
 	
 	/**
@@ -126,9 +140,6 @@ public class ForegroundView extends SurfaceView implements SurfaceHolder.Callbac
 			player.init();
 		}
 		
-		touchX = player.getX();
-		touchY = player.getY();
-			
 		if(guns == null) {
 			guns = enemy.getGuns();
 
@@ -171,6 +182,8 @@ public class ForegroundView extends SurfaceView implements SurfaceHolder.Callbac
 			gameLoopThread.setRunning(true);
 			gameLoopThread.start();
     	}
+    	
+    	touchBox = new RectF(-1,-1,-1,-1);
 		
 		setPauseStatus(false);
 	}
@@ -184,47 +197,57 @@ public class ForegroundView extends SurfaceView implements SurfaceHolder.Callbac
 			frame = (short) ((++frame) % (25 - 3*difficulty));
 
 			canvas.drawRect(blank, erase);
+			            
+            if(!useSensor && touchBox.centerX() >= 0) {
+                meterPaint.setColor(Color.MAGENTA);
+                meterPaint.setStrokeWidth(10);
+                
+                canvas.drawArc(touchBox, 0, 360, true, meterPaint);
+                canvas.drawLine(touchBox.centerX(), touchBox.centerY(), touchBox.centerX()-dX, touchBox.centerY()+dY, meterPaint);
+            }
 			
 			enemy.update(canvas.getHeight());
 		
+			//update Player speed and position
 			if(!useSensor) {
 			    player.setSpeed(Math.atan2(dX, dY), Math.sqrt(dX*dX+dY*dY));
 			}
+		    player.update(canvas.getWidth(), canvas.getHeight(), !isPaused && !init && !gameOver && !lvlClear);
 			
-			synchronized(player) {
-			    player.update(canvas.getWidth(), canvas.getHeight(), !isPaused && !init && !gameOver && !lvlClear);
+		    //game over
+			if(gameOver && System.currentTimeMillis() - stopTime >= 3000) {
+			    ((Activity)getContext()).runOnUiThread(onGameOver);
+			}
+
+			//fire shots during normal gameplay
+			else if(!init && !isPaused && !lvlClear) {
+				shots.addAll(enemy.fireGuns());
 			}
 			
-			if(!init && !isPaused && !lvlClear) {
-				shots.addAll(enemy.fireGuns());
-			}	
-			
+			//stage clear
+			else if(lvlClear && System.currentTimeMillis() - stopTime >= 3000) {
+                saveLvlScore();
+            }
+						
 			playerCenter = player.getCenter();
 			
+			//check Shot status
 			iter = shots.iterator();
 			while(iter.hasNext()) {
 				shot = iter.next();
 				shot.update(!isPaused);
 
-				if(!godMode && !gameOver && checkForHit(shot)) {
-					//TODO: handle game over
+				if(!godMode && !gameOver && !lvlClear && checkForHit(shot)) {
 					player.startExplosion();
 					
 					gameOver = true;
 					
-				      ((Activity)getContext()).runOnUiThread(new Runnable() {
-
-				            @Override
-				            public void run() {
-    				            FragmentManager fragMan = ((Activity)context).getFragmentManager();
-    				            ((GameFragment)fragMan.findFragmentByTag(
-    				                fragMan.getBackStackEntryAt(fragMan.getBackStackEntryCount()-1)
-    				                    .getName()))
-				                    .saveScore();
-				            }
-				        });
+					stopTime = System.currentTimeMillis();
+					
+					break;
 				}
 		
+				//Shot is off screen
 				if(shot.getX() > canvas.getWidth()+25 || shot.getX() < -25 ||
 					shot.getY() < -25 || shot.getY() > canvas.getHeight()+25 ||
 					checkEMPHit(shot)) 
@@ -235,6 +258,7 @@ public class ForegroundView extends SurfaceView implements SurfaceHolder.Callbac
 			
 			enemy.draw(canvas);
 			
+			//Guns track Player 
 			for(Gun gun : guns) {
 				gun.setBearing(playerCenter.x, playerCenter.y);
 				gun.update();
@@ -254,7 +278,7 @@ public class ForegroundView extends SurfaceView implements SurfaceHolder.Callbac
 			}
 
 		    updateAndDrawCharge(canvas);
-
+		    
 			canvas.drawBitmap(pauseButton, pauseSrc, pauseDest, null);
 
 			textPaint.setTextSize(32);
@@ -327,21 +351,23 @@ public class ForegroundView extends SurfaceView implements SurfaceHolder.Callbac
 		
 		if(!init) {
 			if(!isPaused && !gameOver && !lvlClear) {
-				charge += 1f/665f;
+				charge += 1f/665f * (accelTime ? 10f : 1f);
 			
-    			if(charge > 1f) {
+    			if(charge >= 1f) {
     				charge = 1f;
-    
-    				player.setBeamState(true);
+    				
+				    stopTime = System.currentTimeMillis();
+				    
+				    lvlClear = true;
+
+    				player.startBeam();
+    				player.startEMP();
     
     				enemy.startExplosion();
-    			
-    				//TODO: add delay
-    				saveLvlScore();
     
     				dX = dY = 0;
-    
-    				lvlClear = true;
+    				
+    				touchBox.set(-1, -1, -1, -1);
     				
     				guns.clear();
     			}
@@ -375,30 +401,49 @@ public class ForegroundView extends SurfaceView implements SurfaceHolder.Callbac
 	 * @return true if the Shot sprite overlaps with the Player hitbox
 	 */
 	private boolean checkForHit(Shot shot) {
-		playerHitbox = new RectF(player.getHitbox());
+		/*playerHitbox = new RectF(player.getHitbox());
 		
 		Bitmap playerSprite = player.getSprite(), shotSprite = shot.getSprite();
 		
 		boolean result = false;
 		
 		if(playerHitbox.intersect(shot.getHitbox())) {
-			for(int i = (int)playerHitbox.left; i < playerHitbox.right && !result; i++) {
-				for(int j = (int)playerHitbox.top; j < playerHitbox.bottom && !result; j++) {
+		    outerloop:
+			for(int i = (int)playerHitbox.left; i < playerHitbox.right; i++) {
+				for(int j = (int)playerHitbox.top; j < playerHitbox.bottom; j++) {
 					if(playerSprite.getPixel(i - (int)playerHitbox.left, j - (int)playerHitbox.top) == 
 						shotSprite.getPixel(i - (int)playerHitbox.left, j - (int)playerHitbox.top)) 
 					{
 						result = true;
+						
+						break outerloop;
 					}
 				}
 			}
 		}
 		
-		return result;
-		
+		return result;*/
+	    Point p = player.getCenter();
+	    
+	    return p.x < shot.getHitbox().right && 
+	        p.x > shot.getHitbox().left && 
+	        p.y < shot.getHitbox().bottom && 
+	        p.y > shot.getHitbox().top;
 	}
 	
-	public void initParams(short difficulty, int level, int score, int[] enemyIds,
-        SoundPool sounds, HashMap<String, Integer> soundLbls, boolean useSensor, boolean godMode)
+	/**
+	 * Sets the initial game parameters.
+	 * @param difficulty the difficulty level
+	 * @param level the stage level
+	 * @param score the current score
+	 * @param sounds
+	 * @param soundLbls
+	 * @param useSensor
+	 * @param godMode
+	 */
+	public void initParams(short difficulty, int level, int score, 
+        SoundPool sounds, HashMap<String, Integer> soundLbls, boolean useSensor,
+        boolean godMode, boolean accelTime)
 	{
 		this.difficulty = difficulty;
 		this.level = level;
@@ -407,8 +452,13 @@ public class ForegroundView extends SurfaceView implements SurfaceHolder.Callbac
 		this.sounds = sounds;
 		this.useSensor = useSensor;
 		this.godMode = godMode;
+		this.accelTime = accelTime;
 	}
 	
+	/**
+	 * Retrieves the Player.
+	 * @return the Player
+	 */
 	public Player getPlayer() {
 		return player;
 	}
@@ -481,63 +531,55 @@ public class ForegroundView extends SurfaceView implements SurfaceHolder.Callbac
 	}
 
 	@Override
-	public void surfaceChanged(SurfaceHolder arg0, int arg1, int arg2, int arg3) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void surfaceChanged(SurfaceHolder arg0, int arg1, int arg2, int arg3) {}
 
 	@Override
-	public void surfaceCreated(SurfaceHolder arg0) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void surfaceCreated(SurfaceHolder arg0) {}
 
 	@Override
-	public void surfaceDestroyed(SurfaceHolder arg0) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void surfaceDestroyed(SurfaceHolder arg0) {}
 	
 	/**
 	 * Generates the score for the current level.
 	 * @return the score for the level
 	 */
 	public void saveLvlScore() {
-		/*guns.clear();
-		shots.clear();
-		
-		player.init();*/
-      ((Activity)getContext()).runOnUiThread(new Runnable() {
+	    ((Activity)getContext()).runOnUiThread(new Runnable() {
 
             @Override
             public void run() {
-      
-    	    playTime += (int)(System.currentTimeMillis() - startTime);
-    	    int baseScore = (1+level) * 500;
-    	    int timeScore = playTime/1000;
-    	    int lvlScore = difficulty * ((500*(level+1)) + (10000000/playTime));
-            
-    		FragmentManager fragMan = ((Activity)context).getFragmentManager();
-            ((GameFragment)fragMan.findFragmentByTag(
-                fragMan.getBackStackEntryAt(fragMan.getBackStackEntryCount()-1)
-                    .getName()))
-                .updateScore(baseScore, timeScore, lvlScore);
+                playTime += (int)(System.currentTimeMillis() - startTime - 3000);
+        	    
+                float timeBonus = 3f - playTime/30000f;
+                
+                if(timeBonus < 1f) {
+                    timeBonus = 1f;
+                }
+                
+                else if(timeBonus > 2f) {
+                    timeBonus = 2f;
+                }
+        	    
+                int baseScore = (1 + level) * 500;
+        	    int lvlScore = (int)(difficulty * timeBonus * (500*(level+1)));
+                
+        	    ((GameFragment)fragMan.findFragmentByTag(
+                    fragMan.getBackStackEntryAt(fragMan.getBackStackEntryCount()-1)
+                        .getName()))
+                    .updateScore(baseScore, timeBonus, lvlScore);
             }
         });
 	}
 	
 	@Override
 	public boolean onTouchEvent(MotionEvent e) {
-	  //  touchCounter = (short) ((++touchCounter) % 10);
-	    
-        if(/*touchCounter == 0 && */!init && !gameOver && !lvlClear) {
+        if(!init && !gameOver && !lvlClear) {
             switch(e.getAction() & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_DOWN:
     	    	if(pauseDest.contains((int)e.getX(), (int)e.getY())) {
     				setPauseStatus(!isPaused);
     				
     				if(!isPaused) {
-    			    	FragmentManager fragMan = ((Activity)context).getFragmentManager();
     			    	((GameFragment)fragMan.findFragmentByTag(
     		    			fragMan.getBackStackEntryAt(fragMan.getBackStackEntryCount()-1)
     		    				.getName()))
@@ -546,8 +588,7 @@ public class ForegroundView extends SurfaceView implements SurfaceHolder.Callbac
     			}
     	    	
     	    	else if(!useSensor) {
-    	    	    touchX = e.getX();
-    	    	    touchY = e.getY();
+                    touchBox.set(e.getX()-15, e.getY()-15, e.getX()+15, e.getY()+15);
     	    	}
                 
                 break;
@@ -563,14 +604,15 @@ public class ForegroundView extends SurfaceView implements SurfaceHolder.Callbac
     			
             case MotionEvent.ACTION_MOVE:
                 if(!useSensor && !lvlClear) {
-                    dX = touchX - e.getX();
-                    dY = e.getY() - touchY;
+                    dX = touchBox.centerX() - e.getX();
+                    dY = e.getY() - touchBox.centerY();
                 }
 
                 break;
                 
             case MotionEvent.ACTION_UP:
                 dX = dY = 0;
+                touchBox.set(-1, -1, -1, -1);
                 
                 break;
 		    }
@@ -589,6 +631,10 @@ public class ForegroundView extends SurfaceView implements SurfaceHolder.Callbac
 		return true;
 	}
 	
+	/**
+	 * Sets the pause state of the game. Objects will not move when paused.
+	 * @param pause the new pause state
+	 */
 	private void setPauseStatus(boolean pause) {
 		isPaused = pause;
 		
@@ -607,5 +653,26 @@ public class ForegroundView extends SurfaceView implements SurfaceHolder.Callbac
 	 */
     public void setInit(boolean state) {
         init = state;
+    }
+    
+    /**
+     * Resets the game parameters for the new level.
+     * @param level the new level
+     */
+    public void reset(int level) {
+        gameOver = lvlClear = false;
+        
+        this.level = level;
+        
+        frame = 0;
+        playTime = 0;
+        
+        guns.clear();
+        guns = null;
+        
+        enemy = null;
+        
+        player = null;
+        
     }
 }
