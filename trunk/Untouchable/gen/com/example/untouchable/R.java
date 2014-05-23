@@ -56,33 +56,29 @@ public final class R {
         public static final int sprite_shot=0x7f020011;
     }
     public static final class id {
-        public static final int action_settings=0x7f0c001b;
+        public static final int action_settings=0x7f0c0017;
         public static final int baseScore=0x7f0c0005;
         public static final int bg=0x7f0c0000;
         public static final int continueButton=0x7f0c000f;
-        public static final int easy=0x7f0c0015;
         public static final int fg=0x7f0c0002;
-        public static final int hard=0x7f0c0013;
         public static final int lvlScore=0x7f0c000b;
         public static final int main_frame=0x7f0c0001;
         public static final int multiplier=0x7f0c0009;
-        public static final int normal=0x7f0c0014;
-        public static final int optionButton=0x7f0c0017;
+        public static final int optionButton=0x7f0c0013;
         public static final int quitButton=0x7f0c000e;
         public static final int resultStatus=0x7f0c0010;
         public static final int score_list=0x7f0c0012;
         public static final int score_title=0x7f0c0011;
-        public static final int scoresButton=0x7f0c0019;
-        public static final int startButton=0x7f0c0018;
+        public static final int scoresButton=0x7f0c0015;
+        public static final int startButton=0x7f0c0014;
         public static final int tableLayout1=0x7f0c0003;
         public static final int tableRow1=0x7f0c0004;
         public static final int tableRow2=0x7f0c0006;
         public static final int tableRow3=0x7f0c0008;
         public static final int tableRow4=0x7f0c000a;
         public static final int tableRow5=0x7f0c000c;
-        public static final int textView1=0x7f0c0016;
         public static final int timeScore=0x7f0c0007;
-        public static final int title=0x7f0c001a;
+        public static final int title=0x7f0c0016;
         public static final int totalScore=0x7f0c000d;
     }
     public static final class layout {
@@ -90,8 +86,7 @@ public final class R {
         public static final int game=0x7f030001;
         public static final int result=0x7f030002;
         public static final int scores=0x7f030003;
-        public static final int start=0x7f030004;
-        public static final int title=0x7f030005;
+        public static final int title=0x7f030004;
     }
     public static final class menu {
         public static final int main=0x7f0b0000;
@@ -110,7 +105,7 @@ public final class R {
         public static final int app_name=0x7f090001;
         public static final int baseScore=0x7f090010;
         public static final int cancel=0x7f090006;
-        /**  dialog options 
+        /**  dialog text 
          */
         public static final int confirm=0x7f090005;
         public static final int cont=0x7f090007;
