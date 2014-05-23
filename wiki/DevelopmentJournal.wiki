@@ -66,3 +66,17 @@
   * Session scores now persist between levels.
   * Added explosion sprites.
   * Implemented `PreferencesFragment` to select difficulty, control style, and score resetting.
+
+22 May 2014
+  * All UI strings populated from resources.
+  * `TableLayout` in `ResultsFragment` uses proper alignment.
+  * Added accelerated timer option for debug.
+  * Added delay before changing screens after stage clear or game over.
+  * Removed superfluous enemy ID array from `GameFragment`.
+  * `ScoreManager` uses two `ArrayLists` instead of `HashMap` to store scores.
+  * `ResultsFragment` now goes to `TitleFragment` or `GameFragment`.
+  * `GameFragment` increments level from `ResultsFragment`.
+  * `Enemy` properly handles changing sprites and `Gun` placements between levels.
+  * Hit detection uses `Player` center pixel instead of `Player` hitbox.
+  * Removed superfluous `Player` hitbox and associated methods.
+  * `Player` uses beam sound from `SoundPool` instead of custom `AudioTrack`.
