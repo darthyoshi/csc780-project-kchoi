@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+    
+    <CheckBoxPreference 
+        android:summaryOn="@string/useSensor" 
+        android:summaryOff="@string/noSensor" 
+        android:persistent="true"
+        android:key="useSensor" 
+        android:title="@string/tiltControl"/>
+
+    <ListPreference
+        android:persistent="true"
+        android:entries="@array/difficulties"
+        android:entryValues="@array/difficulties" 
+        android:key="difficulty" 
+        android:title="@string/difficulty"
+        android:defaultValue="@string/normal" android:summary="%s"/>
+    
+    <Preference
+        android:summary="@string/resetWarning"
+        android:key="resetScores"
+        android:title="@string/resetScores"
+        />
+    
+    <PreferenceCategory android:title="@string/debug">
+
+        <CheckBoxPreference
+            android:summaryOn="@string/godModeOn" 
+            android:summaryOff="@string/godModeOff" 
+            android:persistent="true" 
+            android:key="godMode" 
+            android:title="@string/godMode"
+            android:defaultValue="false"/>
+
+        <CheckBoxPreference
+            android:title="@string/fastTime"
+            android:key="accelTime"
+            android:summary="@string/fastTimeSummary"
+            android:persistent="true"
+            android:defaultValue="false"/>
+
+    </PreferenceCategory>
+
+</PreferenceScreen>
+<!-- From: file:/home/DarthYoshi/AndroidstudioProjects/Untouchable/app/src/main/res/xml/preferences.xml -->
