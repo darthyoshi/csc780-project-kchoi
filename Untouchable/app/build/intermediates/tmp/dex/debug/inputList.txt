@@ -1,0 +1,2 @@
+/home/DarthYoshi/AndroidstudioProjects/Untouchable/app/build/intermediates/classes/debug
+/home/DarthYoshi/AndroidstudioProjects/Untouchable/app/build/intermediates/pre-dexed/debug/support-v4-19.1.0-bac164a0a8884a4f9cef8692285e44ebaaabec30.jar
